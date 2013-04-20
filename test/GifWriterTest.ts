@@ -74,4 +74,34 @@ t.testAsync("Write logical screen info with color table", function (done) {
     done();
 });
 
+t.testAsync("Write table based image", function (done) {
+    var outputStream = createOutputStream();
+    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    var indexedColorImage = new vividcode.image.IndexedColorImage(
+        { width: 2, height: 2 },
+        [0,0,0,0],
+        [0,0,0]
+    );
+
+    gifWriter.writeTableBasedImage(indexedColorImage);
+
+    t.strictEqual(outputStream.buffer.length, 21, "output 21 bytes");
+    t.deepEqual(outputStream.buffer.slice(0,10),
+        [0x2C, 0x00,0x00, 0x00,0x00, 0x02,0x00, 0x02,0x00, 0x80],
+        "First 10 bytes are bytes of Image Descriptor");
+    t.deepEqual(outputStream.buffer.slice(10,16),
+        [0x00,0x00,0x00, 0x00,0x00,0x00],
+        "Next 6 bytes are bytes of color table");
+    t.deepEqual(outputStream.buffer.slice(16,21),
+        [
+            0x02, // initial code size
+            0x02, // block size
+            0x84, // (10 000 100) binary
+            0x51, // (0 101 000 1) binary
+            0x00  // terminates blocks
+        ],
+        "Last 5 bytes are bytes of Image Data");
+    done();
+});
+
 }).call(this);

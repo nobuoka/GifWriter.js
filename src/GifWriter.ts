@@ -15,6 +15,121 @@ module vividcode.image {
         pxAspectRatio?: number;
     }
 
+    export interface IIndexedColorImage {
+        width: number;
+        height: number;
+        data: number[];
+        paletteData: number[];
+    }
+    export class IndexedColorImage {
+        width: number;
+        height: number;
+        data: number[];
+        paletteData: number[];
+        constructor(size: IImageSize, data: number[], paletteData: number[]) {
+            this.width = size.width;
+            this.height = size.height;
+            this.data = data;
+            this.paletteData = paletteData;
+        }
+    }
+
+    class GifCompressedCodesToByteArrayConverter {
+        private __out: number[];
+        private __remNumBits: number;
+        private __remVal: number;
+        constructor() {
+            this.__out = [];
+            this.__remNumBits = 0;
+            this.__remVal = 0;
+        }
+        push(code, numBits) {
+            while (numBits > 0) {
+                this.__remVal = ((code << this.__remNumBits) & 0xFF) + this.__remVal;
+                if (numBits + this.__remNumBits >= 8) {
+                    this.__out.push(this.__remVal);
+                    numBits = numBits - (8 - this.__remNumBits);
+                    code = (code >> (8 - this.__remNumBits));
+                    this.__remVal = 0;
+                    this.__remNumBits = 0;
+                } else {
+                    this.__remNumBits = numBits + this.__remNumBits;
+                    numBits = 0;
+                }
+            }
+        }
+        flush() {
+            this.push(0, 8);
+            this.__remNumBits = 0;
+            this.__remVal = 0;
+            var out = this.__out;
+            this.__out = [];
+            return out;
+        }
+    }
+
+    function compressWithLZW(actualCodes: number[], numBits: number) {
+        // `numBits` is LZW-initial code size, which indicates how many bits are needed
+        // to represents actual code.
+
+        var bb = new GifCompressedCodesToByteArrayConverter();
+
+        // GIF spec says: A special Clear code is defined which resets all
+        // compression/decompression parameters and tables to a start-up state.
+        // The value of this code is 2**<code size>. For example if the code size
+        // indicated was 4 (image was 4 bits/pixel) the Clear code value would be 16
+        // (10000 binary). The Clear code can appear at any point in the image data
+        // stream and therefore requires the LZW algorithm to process succeeding
+        // codes as if a new data stream was starting. Encoders should
+        // output a Clear code as the first code of each image data stream.
+        var clearCode = (1 << numBits);
+        // GIF spec says: An End of Information code is defined that explicitly
+        // indicates the end of the image data stream. LZW processing terminates
+        // when this code is encountered. It must be the last code output by the
+        // encoder for an image. The value of this code is <Clear code>+1.
+        var endOfInfoCode = clearCode + 1;
+
+        var nextCode;
+        var curNumCodeBits;
+        var dict;
+        function resetAllParamsAndTablesToStartUpState() {
+            // GIF spec says: The first available compression code value is <Clear code>+2.
+            nextCode = endOfInfoCode + 1;
+            curNumCodeBits = numBits + 1;
+            dict = Object.create(null);
+        }
+        resetAllParamsAndTablesToStartUpState();
+        bb.push(clearCode, curNumCodeBits); // clear code at first
+
+        var concatedCodesKey = "";
+        for (var i = 0, len = actualCodes.length; i < len; ++i) {
+            var code = actualCodes[i];
+            var dictKey = String.fromCharCode(code);
+            if (!(dictKey in dict)) dict[dictKey] = code;
+
+            var oldKey = concatedCodesKey;
+            concatedCodesKey += dictKey;
+            if (!(concatedCodesKey in dict)) {
+                bb.push(dict[oldKey], curNumCodeBits);
+
+                // GIF spec defines a maximum code value of 4095 (0xFFF)
+                if (nextCode <= 0xFFF) {
+                    dict[concatedCodesKey] = nextCode;
+                    if (nextCode === (1 << curNumCodeBits)) curNumCodeBits++;
+                    nextCode++;
+                } else {
+                    bb.push(clearCode, curNumCodeBits);
+                    resetAllParamsAndTablesToStartUpState();
+                    dict[dictKey] = code;
+                }
+                concatedCodesKey = dictKey;
+            }
+        }
+        bb.push(dict[concatedCodesKey], curNumCodeBits);
+        bb.push(endOfInfoCode, curNumCodeBits);
+        return bb.flush();
+    }
+
     export class GifWriter {
         private __os: IOutputStream;
         constructor(outputStream: IOutputStream) {
@@ -23,6 +138,22 @@ module vividcode.image {
 
         private __writeInt2(v: number) {
             this.__os.writeBytes([v & 0xFF, (v >> 8) & 0xFF]);
+        }
+
+        private __writeDataSubBlocks(data: number[]) {
+            var os = this.__os;
+            var curIdx = 0;
+            var blockLastIdx;
+            while (curIdx < (blockLastIdx = Math.min(data.length, curIdx + 254))) {
+                var subarray = data.slice(curIdx, blockLastIdx);
+                os.writeByte(subarray.length);
+                os.writeBytes(subarray);
+                curIdx = blockLastIdx;
+            }
+        }
+
+        private __writeBlockTerminator() {
+            this.__os.writeByte(0);
         }
 
         /*
@@ -89,11 +220,68 @@ module vividcode.image {
                 // Size of Global Color Table (3 bits)
                 sizeOfColorTable
             );
-
             // Background Color Index
             os.writeByte(bgColorIndex);
             // Pixel Aspect Ratio
             os.writeByte(pxAspectRatio);
+        }
+
+        // write <Table-Based Image> (::= Image Descriptor [Local Color Table] Image Data)
+        writeTableBasedImage(indexedColorImage: IIndexedColorImage) {
+            var useLocalColorTable = true; // currently use local color table always
+            var sizeOfLocalColorTable = this.__calcSizeOfColorTable(indexedColorImage.paletteData);
+            this.__writeImageDescriptor(indexedColorImage, useLocalColorTable, sizeOfLocalColorTable);
+            if (useLocalColorTable) {
+                this.__writeColorTable(indexedColorImage.paletteData,
+                            (useLocalColorTable ? sizeOfLocalColorTable : 0));
+            }
+            this.__writeImageData(indexedColorImage.data, sizeOfLocalColorTable + 1);
+        }
+
+        private __writeImageDescriptor(indexedColorImage: IIndexedColorImage, useLocalColorTable: bool, sizeOfLocalColorTable: number) {
+            var os = this.__os;
+
+            // Image Separator (1 Byte) : Identifies the beginning of an Image Descriptor
+            os.writeByte(0x2C);
+            // Image Left Position (2 Bytes) : Column number, in pixels, of the left edge
+            //           of the image, with respect to the left edge of the Logical Screen.
+            var leftPos = 0; // currently use fixed value
+            this.__writeInt2(leftPos);
+            // Image Top Position (2 Bytes) : Row number, in pixels, of the top edge of
+            //           the image with respect to the top edge of the Logical Screen.
+            var rightPos = 0; // currently use fixed value
+            this.__writeInt2(rightPos);
+            // Image Width (2 Bytes) and Height (2 bytes)
+            this.__writeInt2(indexedColorImage.width);
+            this.__writeInt2(indexedColorImage.height);
+
+            // <Packed Fields>
+            os.writeByte(
+                // Local Color Table Flag (1 Bit)
+                (useLocalColorTable ? 0x80 : 0x00) |
+                // Interlace Flag (1 Bit)
+                0x00 |
+                // Sort Flag (1 Bit)
+                0x00 |
+                // Reserved (2 Bits)
+                0x00 |
+                // Size of Local Color Table (3 Bits)
+                sizeOfLocalColorTable
+            );
+        }
+
+        private __writeImageData(data: number[], numBitsForCode: number) {
+            var os = this.__os;
+            // Because of some algorithmic constraints, minimum value of `numBitsForCode` is 2
+            if (numBitsForCode === 1) numBitsForCode = 2;
+
+            var compressedBytes = compressWithLZW(data, numBitsForCode);
+            os.writeByte(numBitsForCode);
+            // PACKAGE THE BYTES
+            this.__writeDataSubBlocks(compressedBytes);
+            // GIF spec says : A block with a zero byte count terminates the
+            // Raster Data stream for a given image.
+            this.__writeBlockTerminator();
         }
 
         private __writeColorTable(colorTableData: number[], sizeOfColorTable: number) {
