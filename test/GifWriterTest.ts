@@ -104,4 +104,16 @@ t.testAsync("Write table based image", function (done) {
     done();
 });
 
+t.testAsync("Write trailer", function (done) {
+    var outputStream = createOutputStream();
+    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    gifWriter.writeTrailer();
+
+    t.strictEqual(outputStream.buffer.length, 1, "output 1 bytes");
+    t.deepEqual(outputStream.buffer.slice(0,1), [0x3B],
+        "First 1 byte is byte of Trailer");
+    done();
+
+});
+
 }).call(this);

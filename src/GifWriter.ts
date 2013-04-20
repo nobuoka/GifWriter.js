@@ -178,6 +178,10 @@ module vividcode.image {
             os.writeBytes([0x38, 0x39, 0x61]); // "89a"
         }
 
+        writeTrailer() {
+            this.__os.writeByte(0x3B);
+        }
+
         // write <Logical Screen>
         writeLogicalScreenInfo(imageSize: IImageSize, options?: ILogicalScreenInfoOptions) {
             if (!options) options = {};
