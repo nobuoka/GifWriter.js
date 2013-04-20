@@ -7,12 +7,21 @@ module vividcode.image {
         width: number;
         height: number;
     }
-    export interface ILogicalScreenInfoOptions {
+    export interface IGifLogicalScreenInfoOptions {
         sizeOfColorTable?: number;
         colorTableData?: number[];
         colorTableSortFlag?: bool;
         bgColorIndex?: number;
         pxAspectRatio?: number;
+    }
+    export interface IGifImageOptions {
+        topPosition?: number;
+        leftPosition?: number;
+    }
+    export interface IGifExtendedImageOptions extends IGifImageOptions {
+        delayTimeInMS?: number;
+        disposalMethod?: number;
+        transparentColorIndex?: number;
     }
 
     export interface IIndexedColorImage {
@@ -183,7 +192,7 @@ module vividcode.image {
         }
 
         // write <Logical Screen>
-        writeLogicalScreenInfo(imageSize: IImageSize, options?: ILogicalScreenInfoOptions) {
+        writeLogicalScreenInfo(imageSize: IImageSize, options?: IGifLogicalScreenInfoOptions) {
             if (!options) options = {};
             var sizeOfColorTable =
                 "sizeOfColorTable" in options ? options.sizeOfColorTable :
@@ -231,10 +240,12 @@ module vividcode.image {
         }
 
         // write <Table-Based Image> (::= Image Descriptor [Local Color Table] Image Data)
-        writeTableBasedImage(indexedColorImage: IIndexedColorImage) {
+        writeTableBasedImage(indexedColorImage: IIndexedColorImage, options?: IGifImageOptions) {
+            if (!options) options = {};
             var useLocalColorTable = true; // currently use local color table always
             var sizeOfLocalColorTable = this.__calcSizeOfColorTable(indexedColorImage.paletteData);
-            this.__writeImageDescriptor(indexedColorImage, useLocalColorTable, sizeOfLocalColorTable);
+            this.__writeImageDescriptor(indexedColorImage, useLocalColorTable,
+                sizeOfLocalColorTable, options);
             if (useLocalColorTable) {
                 this.__writeColorTable(indexedColorImage.paletteData,
                             (useLocalColorTable ? sizeOfLocalColorTable : 0));
@@ -242,19 +253,24 @@ module vividcode.image {
             this.__writeImageData(indexedColorImage.data, sizeOfLocalColorTable + 1);
         }
 
-        private __writeImageDescriptor(indexedColorImage: IIndexedColorImage, useLocalColorTable: bool, sizeOfLocalColorTable: number) {
+        writeTableBasedImageWithGraphicControl(indexedColorImage: IIndexedColorImage, gcOpts?: IGifExtendedImageOptions) {
+            this.__writeGraphicControlExtension(gcOpts);
+            this.writeTableBasedImage(indexedColorImage, gcOpts);
+        }
+
+        private __writeImageDescriptor(indexedColorImage: IIndexedColorImage, useLocalColorTable: bool, sizeOfLocalColorTable: number, opts?: IGifExtendedImageOptions) {
             var os = this.__os;
 
             // Image Separator (1 Byte) : Identifies the beginning of an Image Descriptor
             os.writeByte(0x2C);
             // Image Left Position (2 Bytes) : Column number, in pixels, of the left edge
             //           of the image, with respect to the left edge of the Logical Screen.
-            var leftPos = 0; // currently use fixed value
+            var leftPos = ("leftPosition" in opts ? opts.leftPosition : 0);
             this.__writeInt2(leftPos);
             // Image Top Position (2 Bytes) : Row number, in pixels, of the top edge of
             //           the image with respect to the top edge of the Logical Screen.
-            var rightPos = 0; // currently use fixed value
-            this.__writeInt2(rightPos);
+            var topPos = ("topPosition" in opts ? opts.topPosition : 0);
+            this.__writeInt2(topPos);
             // Image Width (2 Bytes) and Height (2 bytes)
             this.__writeInt2(indexedColorImage.width);
             this.__writeInt2(indexedColorImage.height);
@@ -295,6 +311,42 @@ module vividcode.image {
             var remBytes = [];
             while (--rem >= 0) remBytes.push(0);
             os.writeBytes(remBytes);
+        }
+
+        private __writeGraphicControlExtension(options?: IGifExtendedImageOptions) {
+            if (!options) options = {};
+            var os = this.__os;
+            var delay = Math.round((options.delayTimeInMS || 0) / 10);
+            var disposalMethod = ("disposalMethod" in options ? options.disposalMethod : 2);
+            var transparentColorIndex;
+            var transparentColorFlag;
+            if (options.transparentColorIndex >= 0) {
+                transparentColorIndex = options.transparentColorIndex & 0xFF;
+                transparentColorFlag = 1;
+            } else {
+                transparentColorIndex = 0;
+                transparentColorFlag = 0;
+            }
+
+            // Extension Introducer: 0x21
+            // Graphic Control Label: 0xF9
+            // Block Size: always this block containes 4 bytes
+            os.writeBytes([0x21, 0xF9, 0x04]);
+
+            // <Packed Field>
+            os.writeByte(
+                0 | // Reserved (3 bits)
+                (disposalMethod << 2)| // Disposal Method (3 bits)
+                0 | // User Input Flag (1 bit)
+                transparentColorFlag // Transparent Color Flag (1 bit)
+            );
+
+            // Delay Time : 1/100 sec
+            this.__writeInt2(delay);
+            // Transparent Color Index
+            os.writeByte(transparentColorIndex);
+            // Block Terminator
+            os.writeByte(0);
         }
     }
 }
