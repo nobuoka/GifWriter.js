@@ -82,25 +82,105 @@ t.testAsync("Write table based image", function (done) {
         [0,0,0,0],
         [0,0,0]
     );
+    var basicImageDataBytes = [
+        // Image Descriptor
+        0x2C, 0x00,0x00, 0x00,0x00, 0x02,0x00, 0x02,0x00, 0x80,
+        // Color Table
+        0x00,0x00,0x00, 0x00,0x00,0x00,
+        // Image Data
+        0x02, // initial code size
+        0x02, // block size
+        0x84, // (10 000 100) binary
+        0x51, // (0 101 000 1) binary
+        0x00  // terminates blocks
+    ];
 
     gifWriter.writeTableBasedImage(indexedColorImage);
+    t.deepEqual(outputStream.buffer, basicImageDataBytes);
 
-    t.strictEqual(outputStream.buffer.length, 21, "output 21 bytes");
-    t.deepEqual(outputStream.buffer.slice(0,10),
-        [0x2C, 0x00,0x00, 0x00,0x00, 0x02,0x00, 0x02,0x00, 0x80],
-        "First 10 bytes are bytes of Image Descriptor");
-    t.deepEqual(outputStream.buffer.slice(10,16),
-        [0x00,0x00,0x00, 0x00,0x00,0x00],
-        "Next 6 bytes are bytes of color table");
-    t.deepEqual(outputStream.buffer.slice(16,21),
-        [
-            0x02, // initial code size
-            0x02, // block size
-            0x84, // (10 000 100) binary
-            0x51, // (0 101 000 1) binary
-            0x00  // terminates blocks
-        ],
-        "Last 5 bytes are bytes of Image Data");
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImage(indexedColorImage, { leftPosition: 3, topPosition: 5 });
+    var bytesWithPosL3T5 = basicImageDataBytes.map(b => b);
+    bytesWithPosL3T5[1] = 0x03;
+    bytesWithPosL3T5[3] = 0x05;
+    t.deepEqual(outputStream.buffer, bytesWithPosL3T5, "Position options (left: 3, top: 5)");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage);
+    var basicGraphicControlBytes = [
+        // Extension Introducer: 0x21
+        0x21,
+        // Graphic Control Label: 0xF9
+        0xF9,
+        // Block Size: always this block containes 4 bytes
+        0x04,
+        // Diposal Method : 2, User Input Flag : 0, Transparent Color Flag : 0
+        0x08,
+        // Delay Time : 0
+        0x00,0x00,
+        // Transparent Color Index : 0
+        0x00,
+        // Block Terminator
+        0x00
+    ];
+    t.deepEqual(outputStream.buffer, basicGraphicControlBytes.concat(basicImageDataBytes),
+        "Default Graphic Control Extension");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage,
+        { leftPosition: 3, topPosition: 5 });
+    t.deepEqual(outputStream.buffer, basicGraphicControlBytes.concat(bytesWithPosL3T5),
+        "Default Graphic Control Extension with Position options (left: 3, top: 5)");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage,
+        { delayTimeInMS: 1000 });
+    var delayTimeBytes = basicGraphicControlBytes.map(b => b);
+    delayTimeBytes[4] = 100;
+    t.deepEqual(outputStream.buffer, delayTimeBytes.concat(basicImageDataBytes),
+        "Delay Time is set (100)");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage,
+        { transparentColorIndex: 0 });
+    var tcBytes = basicGraphicControlBytes.map(b => b);
+    tcBytes[3] = 0x09;
+    tcBytes[6] = 0x00;
+    t.deepEqual(outputStream.buffer, tcBytes.concat(basicImageDataBytes),
+        "Transparent color is set (0)");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage,
+        { transparentColorIndex: 2 });
+    tcBytes = basicGraphicControlBytes.map(b => b);
+    tcBytes[3] = 0x09;
+    tcBytes[6] = 0x02;
+    t.deepEqual(outputStream.buffer, tcBytes.concat(basicImageDataBytes),
+        "Transparent color is set (2)");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage,
+        { transparentColorIndex: -1 });
+    t.deepEqual(outputStream.buffer, basicGraphicControlBytes.concat(basicImageDataBytes),
+        "Transparent color is not set (2)");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage,
+        { disposalMethod: 3 });
+    var dispBytes = basicGraphicControlBytes.map(b => b);
+    dispBytes[3] = 0x0C; // 0b00001100
+    t.deepEqual(outputStream.buffer, dispBytes.concat(basicImageDataBytes),
+        "Disposal Method is set (3)");
+
+    outputStream.buffer = [];
+    gifWriter.writeTableBasedImageWithGraphicControl(indexedColorImage,
+        { transparentColorIndex: 1, disposalMethod: 3 });
+    var dispTransBytes = basicGraphicControlBytes.map(b => b);
+    dispTransBytes[3] = 0x0D; // 0b00001101
+    dispTransBytes[6] = 0x01;
+    t.deepEqual(outputStream.buffer, dispTransBytes.concat(basicImageDataBytes),
+        "Disposal Method and Transparent color are set");
+
     done();
 });
 
