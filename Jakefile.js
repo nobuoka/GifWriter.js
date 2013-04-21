@@ -56,10 +56,10 @@ var SRC = {
 var targetFilePath = path.join(builtLocalDirectory, "GifWriter.js");
 file(targetFilePath, [builtDirectory, builtLocalDirectory].concat(SRC.MAIN_FILES), function () {
     var cmd =
-        [ CMD.TSC,
-          SRC.MAIN_FILES,
-          "--out " + targetFilePath,
-        ].join(" ");
+        [ CMD.TSC ].
+        concat(SRC.MAIN_FILES).
+        concat([ "--out " + targetFilePath ]).
+        join(" ");
     _execCompileCmd(cmd, targetFilePath + " built!");
 }, {async: true});
 }).call(this);
