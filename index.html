@@ -47,7 +47,7 @@
       </div>
       <div id="result-container"></div>
       <script>
-        var worker = Worker("./demo/worker.js");
+        var worker = new Worker("./demo/worker.js");
         var IMG_SIZE = 128;
 
         var workingSpaceElem;
