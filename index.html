@@ -2,9 +2,143 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>GifWriter.js — GIF Encoder written in TypeScript</title>
+    <title>GifWriter.js — GIF Encoder (TypeScript, JavaScript)</title>
   </head>
   <body>
-    <h1>GifWriter.js — GIF Encoder written in TypeScript</h1>
+    <h1>GifWriter.js — GIF Encoder</h1>
+    <p>Please see
+      <a title="GifWriter.js 0.1.0 Released — Hidamari socket never dies"
+          href="http://en-vividcode.hatenablog.com/entry/release-notes/GifWriter.js-0.1.0"
+          >release notes of version 0.1.0</a> to know about GifWriter.js 0.1.0 in detail.</p>
+    <section>
+      <h2>Downloads</h2>
+      <ul>
+        <li><a href="download/GifWriter-0.1.0.js">GifWriter.js (0.1.0)</a></li>
+      </ul>
+      <p>You can get source files written in TypeScript from
+        <a href="https://github.com/nobuoka/GifWriter.js">a repository on GitHub</a>.</p>
+    </section>
+    <section>
+      <h2>Demo of creating GIF animation with Web Worker</h2>
+      <p>
+        <span>This sample shows that animation GIF is created from these images by using GifWriter.js.</span>
+        <span>These images are distributed at <a href="http://killmebaby.tv/special_icon.html">the official site of “Kill Me Baby” (キルミーベイベー)</a>.</span>
+      </p>
+      <div id="source-images-container">
+        <img src="./demo/01.png">
+        <img src="./demo/02.png">
+        <img src="./demo/05.png">
+        <img src="./demo/06.png">
+        <img src="./demo/03.png">
+        <img src="./demo/04.png">
+        <img src="./demo/07.png">
+        <img src="./demo/08.png">
+      </div>
+      <div style="margin: 15px 0; border-left: solid 5px #999999; padding: 3px 8px;">
+        <div>
+          <label>Palette size (number of colors; min: 1, max: 255): <input type="text" value="255" id="palette-size-input"></label>
+        </div>
+        <div>
+          <label>Delay time [ms] (min: 0, max: 10000): <input type="text" value="200" id="delay-time-input"></label>
+        </div>
+        <div>
+          <button id="start-button" disabled="disabled">please wait...</button>
+        </div>
+      </div>
+      <div id="result-container"></div>
+      <script>
+        var worker = Worker("./demo/worker.js");
+        var IMG_SIZE = 128;
+
+        var workingSpaceElem;
+        var imageDataList;
+        function convertImgElemToImgData(imgElem) {
+            var canvasElem = document.createElement("canvas");
+            canvasElem.style.width = IMG_SIZE + "px";
+            canvasElem.style.height = IMG_SIZE + "px";
+            workingSpaceElem.appendChild(canvasElem);
+            var ctx = canvasElem.getContext("2d");
+            ctx.drawImage(imgElem,0,0,IMG_SIZE,IMG_SIZE);
+            var imgData = ctx.getImageData(0,0,IMG_SIZE,IMG_SIZE);
+            workingSpaceElem.removeChild(canvasElem);
+            return imgData;
+        }
+
+        window.addEventListener("load", function el(evt) {
+            window.removeEventListener("load", el, false);
+
+            workingSpaceElem = document.createElement("div");
+            workingSpaceElem.style.height = "1px";
+            workingSpaceElem.style.overflow = "hidden";
+
+            var imgElems = Array.prototype.slice.call(document.getElementsByTagName("img"));
+            imageDataList = imgElems.map(function (e) {
+                var d;
+                try {
+                    // error will occur if img couldn't be loaded
+                    var d = convertImgElemToImgData(e);
+                } catch (err) {}
+                return d;
+            }).filter(function (e) {
+                return !!e;
+            });
+
+            if (imageDataList.length === 0) {
+                alert("No image could be loaded...");
+                return;
+            }
+
+            var startButtonElem = document.getElementById("start-button");
+            startButtonElem.addEventListener("click", startButtonClickEventHandler, false);
+            startButtonElem.textContent = "Start creating animation GIF";
+            startButtonElem.disabled = false;
+        }, false);
+
+        function createProgressMessageElem() {
+            var e = document.createElement("span");
+            e.style.display = "inline-block";
+            e.style.border = "solid 1px #666666";
+            e.style.verticalAlign = "top";
+            e.style.width = (IMG_SIZE - 2) + "px";
+            e.style.height = (IMG_SIZE - 2) + "px";
+            e.textContent = "please wait...";
+            return e;
+        }
+        var startButtonClickEventHandler = function(evt) {
+            var resultContElem = document.getElementById("result-container");
+            resultContElem.insertBefore(createProgressMessageElem(), resultContElem.firstChild);
+            worker.onmessage = function (evt) {
+                var msg = evt.data;
+                var imgElem = document.createElement("img");
+                imgElem.src = "data:image/gif;base64," + msg.imageDataBase64;
+                var e = resultContElem.firstChild;
+                while (e && e.tagName === "SPAN") {
+                    e = e.nextSibling;
+                }
+                resultContElem.insertBefore(imgElem, e);
+                if (resultContElem.firstChild.tagName === "SPAN")
+                    resultContElem.removeChild(resultContElem.firstChild);
+            };
+            worker.onerror = function (err) {
+                alert(err);
+            };
+            var paletteSize = parseInt(document.getElementById("palette-size-input").value);
+            if (!(1 <= paletteSize && paletteSize <= 255)) paletteSize = 255;
+            var delayTime = parseInt(document.getElementById("delay-time-input").value);
+            if (!(0 <= delayTime && delayTime <= 10000)) paletteSize = 200;
+            worker.postMessage({
+                imageDataList: imageDataList,
+                imageSize: IMG_SIZE,
+                paletteSize: paletteSize,
+                delayTimeInMS: delayTime,
+            });
+        };
+      </script>
+    </section>
+
+    <section>
+      <h2>License</h2>
+      <p>GifWriter.js is released under <a href="http://opensource.org/licenses/MIT">the MIT License</a>.</p>
+    </section>
   </body>
 </html> 

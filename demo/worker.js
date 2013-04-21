@@ -1,0 +1,51 @@
+importScripts("../download/GifWriter-0.1.0.js");
+
+(function () {
+"use strict";
+
+var GifWriter = vividcode.image.GifWriter;
+var IndexedColorImage = vividcode.image.IndexedColorImage;
+var MedianCutColorReducer = vividcode.image.MedianCutColorReducer;
+
+this.onmessage = function (evt) {
+    var msg = evt.data;
+
+    var imageDataList = msg.imageDataList;
+    var paletteSize = msg.paletteSize;
+    var delayTimeInMS = msg.delayTimeInMS;
+    var IMG_SIZE = msg.imageSize;
+
+    var indexedColorImages = imageDataList.map(function (e) {
+        return convertImgDataToIndexedColorImage(e, paletteSize);
+    });
+    var os = {
+        buffer: [],
+        writeByte: function (b) { this.buffer.push(b) },
+        writeBytes: function (bb) { Array.prototype.push.apply(this.buffer, bb) },
+    };
+    var gifWriter = new GifWriter(os);
+    gifWriter.writeHeader();
+    gifWriter.writeLogicalScreenInfo({ width: IMG_SIZE, height: IMG_SIZE });
+    gifWriter.writeLoopControlInfo(0);
+    indexedColorImages.forEach(function (img) {
+        gifWriter.writeTableBasedImageWithGraphicControl(img, { delayTimeInMS: delayTimeInMS });
+    });
+    gifWriter.writeTrailer();
+    var base64Str = btoa(os.buffer.map(function (b) { return String.fromCharCode(b) }).join(""));
+
+    this.postMessage({ imageDataBase64: base64Str });
+};
+
+function convertImgDataToIndexedColorImage(imgData, paletteSize) {
+var reducer = new MedianCutColorReducer(imgData, paletteSize);
+var paletteData = reducer.process();
+var dat = Array.prototype.slice.call(imgData.data);
+var indexedColorImageData = [];
+for (var idx = 0, len = dat.length; idx < len; idx += 4) {
+  var d = dat.slice(idx, idx+4); // r,g,b,a
+  indexedColorImageData.push(reducer.map(d[0],d[1],d[2]));
+}
+return new IndexedColorImage({ width: imgData.width, height: imgData.height },
+      indexedColorImageData, paletteData);
+}
+}).call(this);
