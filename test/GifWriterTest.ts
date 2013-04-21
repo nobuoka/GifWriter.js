@@ -184,6 +184,24 @@ t.testAsync("Write table based image", function (done) {
     done();
 });
 
+t.testAsync("Write Loop Control (Application Extension)", function (done) {
+    var outputStream = createOutputStream();
+    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    gifWriter.writeLoopControlInfo(0x100);
+
+    t.deepEqual(outputStream.buffer,
+        [
+            // Fixed value
+            0x21, 0xFF, 11, 0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45,
+            0x32, 0x2E, 0x30, 3, 0x01,
+            // according to loop count
+            0x00, 0x01,
+            // Fixed value
+            0x00,
+        ]);
+    done();
+});
+
 t.testAsync("Write trailer", function (done) {
     var outputStream = createOutputStream();
     var gifWriter = new vividcode.image.GifWriter(outputStream);

@@ -348,5 +348,27 @@ module vividcode.image {
             // Block Terminator
             os.writeByte(0);
         }
+
+        // One of Application Extension
+        writeLoopControlInfo(repeatCount: number) {
+            this.__os.writeBytes([
+                // Extension Introducer
+                0x21,
+                // Extension Label
+                0xFF,
+                // Block Size
+                11,
+                // Application Identifier (8 Bytes) : "NETSCAPE"
+                0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45,
+                // Appl. Authentication Code (3 Bytes) : "2.0"
+                0x32, 0x2E, 0x30,
+                // Application Data
+                3, // Sub-Block size
+                0x01,
+                (repeatCount & 0xFF), ((repeatCount >> 8) & 0xFF),
+                // Block Terminator
+                0x00,
+            ]);
+        }
     }
 }
