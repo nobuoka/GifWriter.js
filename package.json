@@ -1,0 +1,11 @@
+{ "name": "gif-writer"
+, "version": "0.1.0"
+, "scripts": {
+    "test": "jake test:all"
+  }
+, "devDependencies": {
+    "typescript": ">=0.8.2",
+    "jake": "*",
+    "mocha": "*"
+  }
+}

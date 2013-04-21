@@ -1,0 +1,288 @@
+module vividcode.image {
+    // same interface that `ImageData` interface of HTML standard
+    export interface IImageData {
+        width: number;
+        height: number;
+        data: number[];
+    }
+
+    // Partition-based general selection algorithm
+    // see : http://en.wikipedia.org/wiki/Selection_algorithm
+
+    function swap(array, idx1, idx2) {
+        var tmp = array[idx1];
+        array[idx1] = array[idx2];
+        array[idx2] = tmp;
+    }
+    function partition(a, left, right, pivotIndex) {
+        var pivotValue = a[pivotIndex];
+        swap(a, pivotIndex, right);
+        var storeIndex = left;
+        for (var i = left; i < right; ++i) {
+            if (a[i] <= pivotValue) {
+                swap(a, storeIndex, i);
+                storeIndex = storeIndex + 1;
+            }
+        }
+        swap(a, right, storeIndex);
+        return storeIndex
+    }
+    function selectKthElem(list, left, right, k) {
+        while (true) {
+            // select pivotIndex between left and right
+            var pivotIndex = Math.floor((right + left) / 2);
+            var pivotNewIndex = partition(list, left, right, pivotIndex);
+            var pivotDist = pivotNewIndex - left + 1;
+            if (k === pivotDist) {
+                return list[pivotNewIndex];
+            } else if (k < pivotDist) {
+                right = pivotNewIndex - 1;
+            } else {
+                k = k - pivotDist;
+                left = pivotNewIndex + 1;
+            }
+        }
+    }
+
+    function searchClosestColor(color: IColor, palette: IColor[]) {
+        var idx = searchClosestColorIndex(color, palette);
+        return palette[idx];
+    }
+    function searchClosestColorIndex(color: IColor, palette: IColor[]) {
+        var min = 0;
+        var found = false;
+        var foundIndex = -1;
+        var closestIndex = -1;
+        var index = 0;
+        palette.forEach(function (p, idx) {
+            var d = Math.floor(
+                Math.pow(color.red - p.red, 2) +
+                Math.pow(color.green - p.green, 2) +
+                Math.pow(color.blue - p.blue, 2)
+            );
+            if (d == 0) {
+                found = true;
+                foundIndex = idx;
+                closestIndex = idx;
+            } else if (min == 0 || d < min) {
+                closestIndex = idx;
+                min = d
+            }
+        });
+        return (found ? foundIndex : closestIndex);
+    }
+
+    export interface IColor {
+        red: number;
+        blue: number;
+        green: number;
+    }
+    class ColorCube {
+        colors: IColor[];
+        __minR: number;
+        __maxR: number;
+        __minB: number;
+        __maxB: number;
+        __minG: number;
+        __maxG: number;
+        constructor(colors: IColor[]) {
+            this.colors = colors;
+            var minR = 255
+            var maxR = 0
+            var minG = 255
+            var maxG = 0
+            var minB = 255
+            var maxB = 0
+
+            colors.forEach(function (color) {
+                if(color.red < minR) minR = color.red;
+                if(color.red > maxR) maxR = color.red;
+                if(color.green < minG) minG = color.green;
+                if(color.green > maxG) maxG = color.green;
+                if(color.blue < minB) minB = color.blue;
+                if(color.blue > maxB) maxB = color.blue;
+            });
+
+            this.__minR = minR;
+            this.__maxR = maxR;
+            this.__minG = minG;
+            this.__maxG = maxG;
+            this.__minB = minB;
+            this.__maxB = maxB;
+        }
+
+        divide() {
+            var cut = this.largestEdge()
+            var med = this.median(cut)
+            var r = this.divideBy(cut, med)
+            return r;
+        }
+
+        divideBy(cutTargetColor, median) {
+            var list0 = [];
+            var list1 = [];
+            this.colors.forEach(function (c) {
+                if (c[cutTargetColor] < median) {
+                    list0.push(c);
+                }else{
+                    list1.push(c);
+                }
+            });
+            if(list0.length > 0 && list1.length > 0){
+                return [new ColorCube(list0), new ColorCube(list1)];
+            }else{
+                return [];
+            }
+        }
+
+        median(cutTargetColor) {
+            var cc = [];
+            var colors = this.colors;
+            for (var i = 0, len = colors.length; i < len; ++i) {
+                cc.push(colors[i][cutTargetColor]);
+            }
+            var med2 = selectKthElem(cc, 0, cc.length - 1, Math.floor(cc.length / 2) + 1);
+            return med2;
+        }
+
+        largestEdge() {
+            var diffR = (this.__maxR - this.__minR) * 1.0;
+            var diffG = (this.__maxG - this.__minG) * 0.8;
+            var diffB = (this.__maxB - this.__minB) * 0.5;
+
+            if (diffG >= diffB){
+                if(diffR >= diffG){
+                    return "red";
+                }else{
+                    return "green";
+                }
+            } else {
+                if(diffR >=diffB){
+                    return "red";
+                } else{
+                    return "blue";
+                }
+            }
+        }
+
+        getNumberOfColors() {
+            return this.colors.length;
+        }
+
+        average() {
+            var sumR = 0
+            var sumG = 0
+            var sumB = 0
+            this.colors.forEach(function (c) {
+                sumR += c.red;
+                sumG += c.green;
+                sumB += c.blue;
+            });
+            var size = this.colors.length;
+            return {
+                red: Math.floor(sumR/size),
+                green: Math.floor(sumG/size),
+                blue: Math.floor(sumB/size),
+            };
+        }
+    }
+
+    export class MedianCutColorReducer {
+        private __imageData: IImageData;
+        private __maxPaletteSize: number;
+        private __palette: IColor[];
+        private __colorReductionMap: { [colorRGBStr: string]: number; };
+
+        constructor(imageData: IImageData, maxPaletteSize: number) {
+            this.__imageData = imageData;
+            this.__maxPaletteSize = maxPaletteSize || 0xFF;
+        }
+
+        process() {
+            var imageData = this.__imageData;
+            var maxcolor = this.__maxPaletteSize;
+
+            var colors = this.__extractColors(imageData);
+            var cubes = this.__medianCut(colors, maxcolor);
+            var palette: IColor[] = [];
+            var colorReductionMap = Object.create(null);
+            cubes.forEach(function (cube, idx) {
+                palette.push(cube.average());
+                cube.colors.forEach(function (c) {
+                    var rgb = ((c.red << 16) | (c.green << 8) | (c.blue << 0)).toString(16);
+                    while (6 - rgb.length) rgb = "0" + rgb;
+                    colorReductionMap[rgb] = idx;
+                });
+            });
+            this.__palette = palette;
+            this.__colorReductionMap = colorReductionMap;
+
+            var paletteData: number[] = [];
+            palette.forEach(function (color) {
+                paletteData.push(color.red);
+                paletteData.push(color.green);
+                paletteData.push(color.blue);
+            });
+            return paletteData;
+        }
+
+        map(r: number, g: number, b: number) {
+            var rgb = ((r << 16) | (g << 8) | (b << 0)).toString(16);
+            while (6 - rgb.length) rgb = "0" + rgb;
+            if (!(rgb in this.__colorReductionMap)) {
+                this.__colorReductionMap[rgb] =
+                    searchClosestColorIndex({ red: r, green: g, blue: b }, this.__palette);
+            }
+            return this.__colorReductionMap[rgb];
+        }
+
+        private __extractColors(imageData: IImageData) {
+            var maxIndex = imageData.width * imageData.height;
+
+            var colorHash = {};
+            var colors = [];
+            for (var i = 0; i < maxIndex; ++i) {
+                var r = imageData.data[i*4+0];
+                var g = imageData.data[i*4+1];
+                var b = imageData.data[i*4+2];
+                var rgb = ((r << 16) | (g << 8) | (b << 0)).toString(16);
+                while (6 - rgb.length) rgb = "0" + rgb;
+                if (!colorHash[rgb]) {
+                    colorHash[rgb] = true;
+                    colors.push({ red: r, green: g, blue: b });
+                }
+            }
+            return colors;
+        }
+
+        private __medianCut(colors, maxColor) {
+            var cube = new ColorCube(colors);
+            var divided = this.__divideUntil([cube], maxColor);
+            return divided;
+        }
+
+        private __divideUntil(cubes: any[], limit: number) {
+            while (true) {
+                if (cubes.length >= limit) break;
+                var largestCube = this.__getLargestCube(cubes);
+                var dcubes = largestCube.divide();
+                if (dcubes.length < 2) break;
+                cubes = cubes.filter(function (c) { return c !== largestCube }).concat(dcubes);
+            }
+            return cubes;
+        }
+
+        private __getLargestCube(cubes) {
+            var max = null;
+            var maxCount = 0
+            cubes.forEach(function (x) {
+                var cc = x.getNumberOfColors();
+                if(cc > maxCount){
+                    max = x;
+                    maxCount = cc;
+                }
+            });
+            return max
+        }
+    }
+}
