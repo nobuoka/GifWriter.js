@@ -46,17 +46,20 @@ function _execCompileCmd(cmd, successMsg) {
 }
 
 var SRC = {
-    MAIN: "src/GifWriter.ts",
+    MAIN_FILES: [
+        "src/GifWriter.ts",
+        "src/MedianCutColorReducer.ts",
+    ],
 };
 
 (function () {
 var targetFilePath = path.join(builtLocalDirectory, "GifWriter.js");
-file(targetFilePath, [builtDirectory, builtLocalDirectory, SRC.MAIN], function () {
+file(targetFilePath, [builtDirectory, builtLocalDirectory].concat(SRC.MAIN_FILES), function () {
     var cmd =
-        [ CMD.TSC,
-          SRC.MAIN,
-          "--out " + targetFilePath,
-        ].join(" ");
+        [ CMD.TSC ].
+        concat(SRC.MAIN_FILES).
+        concat([ "--out " + targetFilePath ]).
+        join(" ");
     _execCompileCmd(cmd, targetFilePath + " built!");
 }, {async: true});
 }).call(this);
@@ -64,7 +67,9 @@ file(targetFilePath, [builtDirectory, builtLocalDirectory, SRC.MAIN], function (
 
 var SRC_TEST = {
     TESTS: [
+        "test/test_common.ts",
         "test/GifWriterTest.ts",
+        "test/MedianCutColorReducerTest.ts",
     ]
 };
 
@@ -72,7 +77,7 @@ directory(builtTestDirectory);
 
 (function () {
 var targetFilePath = path.join(builtTestDirectory, "tests.js");
-var srcFilePaths = [ SRC.MAIN ].concat(SRC_TEST.TESTS);
+var srcFilePaths = SRC.MAIN_FILES.concat(SRC_TEST.TESTS);
 file(targetFilePath, [builtDirectory, builtTestDirectory].concat(srcFilePaths), function () {
     var cmd = [].
         concat([ CMD.TSC ]).
