@@ -64,6 +64,7 @@ file(targetFilePath, [builtDirectory, builtLocalDirectory, SRC.MAIN], function (
 
 var SRC_TEST = {
     TESTS: [
+        "test/test_common.ts",
         "test/GifWriterTest.ts",
     ]
 };
