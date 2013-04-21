@@ -190,7 +190,6 @@ t.testAsync("Write trailer", function (done) {
     t.deepEqual(outputStream.buffer.slice(0,1), [0x3B],
         "First 1 byte is byte of Trailer");
     done();
-
 });
 
 }).call(this);
