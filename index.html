@@ -110,7 +110,8 @@
             worker.onmessage = function (evt) {
                 var msg = evt.data;
                 var imgElem = document.createElement("img");
-                imgElem.src = "data:image/gif;base64," + msg.imageDataBase64;
+                var base64Str = btoa(msg.gifDataStr);
+                imgElem.src = "data:image/gif;base64," + base64Str;
                 var e = resultContElem.firstChild;
                 while (e && e.tagName === "SPAN") {
                     e = e.nextSibling;

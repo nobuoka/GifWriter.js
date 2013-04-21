@@ -31,9 +31,9 @@ this.onmessage = function (evt) {
         gifWriter.writeTableBasedImageWithGraphicControl(img, { delayTimeInMS: delayTimeInMS });
     });
     gifWriter.writeTrailer();
-    var base64Str = btoa(os.buffer.map(function (b) { return String.fromCharCode(b) }).join(""));
 
-    this.postMessage({ imageDataBase64: base64Str });
+    var gifDataStr = os.buffer.map(function (b) { return String.fromCharCode(b) }).join("");
+    this.postMessage({ gifDataStr: gifDataStr });
 };
 
 function convertImgDataToIndexedColorImage(imgData, paletteSize) {
