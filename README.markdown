@@ -1,6 +1,8 @@
 GifWriter.js
 ====================
 
+[![Build Status](https://travis-ci.org/nobuoka/GifWriter.js.svg?branch=dev)](https://travis-ci.org/nobuoka/GifWriter.js)
+
 GIF (version 89a) Encoder written in TypeScript
 
 * [GIF89a spec](http://www.w3.org/Graphics/GIF/spec-gif89a.txt)
