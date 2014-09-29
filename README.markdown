@@ -8,38 +8,35 @@ GIF (version 89a) Encoder written in TypeScript
 Requirements
 ------------------------------
 
-To build GifWriter.js, following tools are needed:
+At first, you need to install following tools:
 
-* Build tool: [jake](https://npmjs.org/package/jake)
-* TypeScript Compiler: [tsc](http://www.typescriptlang.org/#Download)
+* [npm](https://npmjs.org/doc/README.html).
 
-To run tests, following libraries are needed:
+Then, you can install dependencies:
 
-* Mocha: [mocha](http://visionmedia.github.com/mocha/)
-
-These dependencies managed by [npm](https://npmjs.org/doc/README.html). (see: package.json)
+```
+$ npm install
+```
 
 Build and Test
 ------------------------------
 
-Jake, the build tool for Node.js is used.
-
 To build, execute:
 
 ````
-$ jake
+$ PATH=`npm bin`:$PATH gulp build:normal
 ````
 
 To run all tests available on command line interface:
 
 ````
-$ jake test:all
+$ PATH=`npm bin`:$PATH gulp test:all
 ````
 
 To see all tasks:
 
 ````
-$ jake --tasks
+$ PATH=`npm bin`:$PATH gulp --tasks
 ````
 
 License

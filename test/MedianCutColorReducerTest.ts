@@ -1,3 +1,5 @@
+/// <reference path="test_common.ts"/>
+
 (function () {
 "use strict";
 

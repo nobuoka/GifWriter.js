@@ -1,11 +1,12 @@
 { "name": "gif-writer"
 , "version": "0.1.0"
 , "scripts": {
-    "test": "jake test:all"
+    "test": "gulp test:all"
   }
 , "devDependencies": {
-    "typescript": ">=0.9.0",
-    "jake": "*",
-    "mocha": "*"
+    "gulp": "*",
+    "gulp-newer": "*",
+    "gulp-tsc": "*",
+    "gulp-mocha": "*"
   }
 }
