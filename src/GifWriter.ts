@@ -10,7 +10,7 @@ module vividcode.image {
     export interface IGifLogicalScreenInfoOptions {
         sizeOfColorTable?: number;
         colorTableData?: number[];
-        colorTableSortFlag?: bool;
+        colorTableSortFlag?: boolean;
         bgColorIndex?: number;
         pxAspectRatio?: number;
     }
@@ -217,7 +217,7 @@ module vividcode.image {
             return sct;
         }
 
-        private __writeLogicalScreenDescriptor(imageSize: IImageSize, useGlobalColorTable: bool, colorTableSortFlag: bool, sizeOfColorTable: number, bgColorIndex: number, pxAspectRatio: number) {
+        private __writeLogicalScreenDescriptor(imageSize: IImageSize, useGlobalColorTable: boolean, colorTableSortFlag: boolean, sizeOfColorTable: number, bgColorIndex: number, pxAspectRatio: number) {
             var os = this.__os;
             // Logical Screen Width and Height
             this.__writeInt2(imageSize.width);
@@ -258,7 +258,7 @@ module vividcode.image {
             this.writeTableBasedImage(indexedColorImage, gcOpts);
         }
 
-        private __writeImageDescriptor(indexedColorImage: IIndexedColorImage, useLocalColorTable: bool, sizeOfLocalColorTable: number, opts?: IGifExtendedImageOptions) {
+        private __writeImageDescriptor(indexedColorImage: IIndexedColorImage, useLocalColorTable: boolean, sizeOfLocalColorTable: number, opts?: IGifExtendedImageOptions) {
             var os = this.__os;
 
             // Image Separator (1 Byte) : Identifies the beginning of an Image Descriptor
