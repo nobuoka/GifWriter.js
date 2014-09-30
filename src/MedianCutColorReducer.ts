@@ -9,12 +9,12 @@ module vividcode.image {
     // Partition-based general selection algorithm
     // see : http://en.wikipedia.org/wiki/Selection_algorithm
 
-    function swap(array, idx1, idx2) {
+    function swap(array: number[], idx1: number, idx2: number) {
         var tmp = array[idx1];
         array[idx1] = array[idx2];
         array[idx2] = tmp;
     }
-    function partition(a, left, right, pivotIndex) {
+    function partition(a: number[], left: number, right: number, pivotIndex: number) {
         var pivotValue = a[pivotIndex];
         swap(a, pivotIndex, right);
         var storeIndex = left;
@@ -27,7 +27,7 @@ module vividcode.image {
         swap(a, right, storeIndex);
         return storeIndex
     }
-    function selectKthElem(list, left, right, k) {
+    function selectKthElem(list: number[], left: number, right: number, k: number) {
         while (true) {
             // select pivotIndex between left and right
             var pivotIndex = Math.floor((right + left) / 2);
@@ -54,7 +54,7 @@ module vividcode.image {
         var foundIndex = -1;
         var closestIndex = -1;
         var index = 0;
-        palette.forEach(function (p, idx) {
+        palette.forEach((p, idx) => {
             var d = Math.floor(
                 Math.pow(color.red - p.red, 2) +
                 Math.pow(color.green - p.green, 2) +
@@ -94,13 +94,13 @@ module vividcode.image {
             var minB = 255
             var maxB = 0
 
-            colors.forEach(function (color) {
-                if(color.red < minR) minR = color.red;
-                if(color.red > maxR) maxR = color.red;
-                if(color.green < minG) minG = color.green;
-                if(color.green > maxG) maxG = color.green;
-                if(color.blue < minB) minB = color.blue;
-                if(color.blue > maxB) maxB = color.blue;
+            colors.forEach((color) => {
+                if (color.red < minR) minR = color.red;
+                if (color.red > maxR) maxR = color.red;
+                if (color.green < minG) minG = color.green;
+                if (color.green > maxG) maxG = color.green;
+                if (color.blue < minB) minB = color.blue;
+                if (color.blue > maxB) maxB = color.blue;
             });
 
             this.__minR = minR;
@@ -118,28 +118,28 @@ module vividcode.image {
             return r;
         }
 
-        divideBy(cutTargetColor, median) {
-            var list0 = [];
-            var list1 = [];
-            this.colors.forEach(function (c) {
-                if (c[cutTargetColor] < median) {
+        divideBy(cutTargetColor: string, median: number) {
+            var list0: IColor[] = [];
+            var list1: IColor[] = [];
+            this.colors.forEach((c) => {
+                if ((<any>c)[cutTargetColor] < median) {
                     list0.push(c);
-                }else{
+                } else {
                     list1.push(c);
                 }
             });
-            if(list0.length > 0 && list1.length > 0){
+            if (list0.length > 0 && list1.length > 0) {
                 return [new ColorCube(list0), new ColorCube(list1)];
-            }else{
+            } else {
                 return [];
             }
         }
 
-        median(cutTargetColor) {
-            var cc = [];
+        median(cutTargetColor: string) {
+            var cc: number[] = [];
             var colors = this.colors;
             for (var i = 0, len = colors.length; i < len; ++i) {
-                cc.push(colors[i][cutTargetColor]);
+                cc.push((<any>(colors[i]))[cutTargetColor]);
             }
             var med2 = selectKthElem(cc, 0, cc.length - 1, Math.floor(cc.length / 2) + 1);
             return med2;
@@ -150,16 +150,16 @@ module vividcode.image {
             var diffG = (this.__maxG - this.__minG) * 0.8;
             var diffB = (this.__maxB - this.__minB) * 0.5;
 
-            if (diffG >= diffB){
-                if(diffR >= diffG){
+            if (diffG >= diffB) {
+                if (diffR >= diffG) {
                     return "red";
-                }else{
+                } else {
                     return "green";
                 }
             } else {
-                if(diffR >=diffB){
+                if (diffR >=diffB) {
                     return "red";
-                } else{
+                } else {
                     return "blue";
                 }
             }
@@ -173,7 +173,7 @@ module vividcode.image {
             var sumR = 0
             var sumG = 0
             var sumB = 0
-            this.colors.forEach(function (c) {
+            this.colors.forEach((c) => {
                 sumR += c.red;
                 sumG += c.green;
                 sumB += c.blue;
@@ -206,7 +206,7 @@ module vividcode.image {
             var cubes = this.__medianCut(colors, maxcolor);
             var palette: IColor[] = [];
             var colorReductionMap = Object.create(null);
-            cubes.forEach(function (cube, idx) {
+            cubes.forEach((cube, idx) => {
                 palette.push(cube.average());
                 cube.colors.forEach(function (c) {
                     var rgb = ((c.red << 16) | (c.green << 8) | (c.blue << 0)).toString(16);
@@ -218,7 +218,7 @@ module vividcode.image {
             this.__colorReductionMap = colorReductionMap;
 
             var paletteData: number[] = [];
-            palette.forEach(function (color) {
+            palette.forEach((color) => {
                 paletteData.push(color.red);
                 paletteData.push(color.green);
                 paletteData.push(color.blue);
@@ -239,8 +239,8 @@ module vividcode.image {
         private __extractColors(imageData: IImageData) {
             var maxIndex = imageData.width * imageData.height;
 
-            var colorHash = {};
-            var colors = [];
+            var colorHash: { [rgb: string]: boolean; } = {};
+            var colors: IColor[] = [];
             for (var i = 0; i < maxIndex; ++i) {
                 var r = imageData.data[i*4+0];
                 var g = imageData.data[i*4+1];
@@ -255,13 +255,13 @@ module vividcode.image {
             return colors;
         }
 
-        private __medianCut(colors, maxColor) {
+        private __medianCut(colors: IColor[], maxColor: number) {
             var cube = new ColorCube(colors);
             var divided = this.__divideUntil([cube], maxColor);
             return divided;
         }
 
-        private __divideUntil(cubes: any[], limit: number) {
+        private __divideUntil(cubes: ColorCube[], limit: number) {
             while (true) {
                 if (cubes.length >= limit) break;
                 var largestCube = this.__getLargestCube(cubes);
@@ -272,17 +272,17 @@ module vividcode.image {
             return cubes;
         }
 
-        private __getLargestCube(cubes) {
-            var max = null;
+        private __getLargestCube(cubes: ColorCube[]) {
+            var max: ColorCube = null;
             var maxCount = 0
-            cubes.forEach(function (x) {
+            cubes.forEach((x) => {
                 var cc = x.getNumberOfColors();
-                if(cc > maxCount){
+                if (cc > maxCount) {
                     max = x;
                     maxCount = cc;
                 }
             });
-            return max
+            return max;
         }
     }
 }

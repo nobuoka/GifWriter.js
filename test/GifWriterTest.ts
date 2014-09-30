@@ -5,7 +5,7 @@
 
 function createOutputStream() {
     return {
-        buffer: [],
+        buffer: <string[]>[],
         writeByte: function (b: number) {
             this.buffer.push(b);
         },

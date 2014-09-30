@@ -17,7 +17,7 @@ gulp.task('build:normal', function (){
   var outFileName = "GifWriter.js";
   return gulp.src(['src/**/*.ts'])
       .pipe(newer(path.join(builtLocalDirectory, outFileName)))
-      .pipe(typescript({ out: outFileName, removeComments: true }))
+      .pipe(typescript({ out: outFileName, noImplicitAny: true, removeComments: true }))
       .pipe(gulp.dest(builtLocalDirectory));
 });
 
@@ -26,7 +26,7 @@ gulp.task('build:tests', function (){
   var outFileName = "tests.js";
   return gulp.src(['src/**/*.ts', 'test/**/*.ts'])
       .pipe(newer(path.join(builtTestDirectory, outFileName)))
-      .pipe(typescript({ out: outFileName, removeComments: true }))
+      .pipe(typescript({ out: outFileName, noImplicitAny: true, removeComments: true }))
       .pipe(gulp.dest(builtTestDirectory));
 });
 

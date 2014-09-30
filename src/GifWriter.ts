@@ -52,7 +52,7 @@ module vividcode.image {
             this.__remNumBits = 0;
             this.__remVal = 0;
         }
-        push(code, numBits) {
+        push(code: number, numBits: number) {
             while (numBits > 0) {
                 this.__remVal = ((code << this.__remNumBits) & 0xFF) + this.__remVal;
                 if (numBits + this.__remNumBits >= 8) {
@@ -98,9 +98,9 @@ module vividcode.image {
         // encoder for an image. The value of this code is <Clear code>+1.
         var endOfInfoCode = clearCode + 1;
 
-        var nextCode;
-        var curNumCodeBits;
-        var dict;
+        var nextCode: number;
+        var curNumCodeBits: number;
+        var dict: { [key: string]: number; };
         function resetAllParamsAndTablesToStartUpState() {
             // GIF spec says: The first available compression code value is <Clear code>+2.
             nextCode = endOfInfoCode + 1;
@@ -152,7 +152,7 @@ module vividcode.image {
         private __writeDataSubBlocks(data: number[]) {
             var os = this.__os;
             var curIdx = 0;
-            var blockLastIdx;
+            var blockLastIdx: number;
             while (curIdx < (blockLastIdx = Math.min(data.length, curIdx + 254))) {
                 var subarray = data.slice(curIdx, blockLastIdx);
                 os.writeByte(subarray.length);
@@ -206,7 +206,7 @@ module vividcode.image {
             if (!!options.colorTableData) this.__writeColorTable(options.colorTableData, sizeOfColorTable);
         }
 
-        private __calcSizeOfColorTable(colorTableData) {
+        private __calcSizeOfColorTable(colorTableData: number[]) {
             var numColors = colorTableData.length / 3;
             var sct = 0;
             var v = 2;
@@ -308,7 +308,7 @@ module vividcode.image {
             var os = this.__os;
             os.writeBytes(colorTableData);
             var rem = (3 * Math.pow(2, sizeOfColorTable+1)) - colorTableData.length;
-            var remBytes = [];
+            var remBytes: number[] = [];
             while (--rem >= 0) remBytes.push(0);
             os.writeBytes(remBytes);
         }
@@ -318,8 +318,8 @@ module vividcode.image {
             var os = this.__os;
             var delay = Math.round((options.delayTimeInMS || 0) / 10);
             var disposalMethod = ("disposalMethod" in options ? options.disposalMethod : 2);
-            var transparentColorIndex;
-            var transparentColorFlag;
+            var transparentColorIndex: number;
+            var transparentColorFlag: number;
             if (options.transparentColorIndex >= 0) {
                 transparentColorIndex = options.transparentColorIndex & 0xFF;
                 transparentColorFlag = 1;
