@@ -1,0 +1,30 @@
+plugins {
+    id "com.moowork.node" version "0.10"
+}
+
+node {
+    version = '0.12.7'
+    npmVersion = '2.13.2'
+    download = true
+}
+
+task compileTypeScript(type: NodeTask, dependsOn: npmInstall) {
+    script = file('node_modules/typescript/bin/tsc')
+    args = ['-p', 'src']
+}
+
+task assemble(dependsOn: compileTypeScript)
+
+task compileTestTypeScript(type: NodeTask, dependsOn: compileTypeScript) {
+    script = file('node_modules/typescript/bin/tsc')
+    args = ['-p', 'test']
+}
+
+task test(type: NodeTask, dependsOn: compileTestTypeScript) {
+    script = file('node_modules/mocha/bin/mocha')
+    args = ['-u', 'qunit', '-R', 'tap', 'built/tests.js']
+}
+
+task check(dependsOn: test)
+
+task build(dependsOn: [assemble, check])

@@ -1,3 +1,4 @@
+/// <reference path="..\src\GifWriter.ts" />
 /// <reference path="test_common.ts"/>
 
 (function () {

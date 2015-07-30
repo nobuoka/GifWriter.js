@@ -1,12 +1,11 @@
-{ "name": "gif-writer"
-, "version": "0.1.0"
-, "scripts": {
-    "test": "gulp test:all"
-  }
-, "devDependencies": {
-    "gulp": "*",
-    "gulp-newer": "*",
-    "gulp-tsc": "*",
-    "gulp-mocha": "*"
+{
+  "name": "gif-writer",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "./gradlew check"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "typescript": "^1.5.3"
   }
 }

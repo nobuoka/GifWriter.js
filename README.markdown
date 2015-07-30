@@ -7,18 +7,12 @@ GIF (version 89a) Encoder written in TypeScript
 
 * [GIF89a spec](http://www.w3.org/Graphics/GIF/spec-gif89a.txt)
 
-Requirements
+Build system requirements
 ------------------------------
 
-At first, you need to install following tools:
+At first, you need to install Java Runtime Environment:
 
-* [npm](https://npmjs.org/doc/README.html).
-
-Then, you can install dependencies:
-
-```
-$ npm install
-```
+* [JRE](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
 Build and Test
 ------------------------------
@@ -26,19 +20,19 @@ Build and Test
 To build, execute:
 
 ````
-$ PATH=`npm bin`:$PATH gulp build:normal
+$ ./gradlew assemble
 ````
 
 To run all tests available on command line interface:
 
 ````
-$ PATH=`npm bin`:$PATH gulp test:all
+$ ./gradlew check
 ````
 
 To see all tasks:
 
 ````
-$ PATH=`npm bin`:$PATH gulp --tasks
+$ ./gradlew tasks
 ````
 
 License

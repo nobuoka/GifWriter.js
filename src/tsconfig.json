@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "out": "./built/GifWriter.js"
+    }
+}

@@ -1,3 +1,4 @@
+/// <reference path="..\src\MedianCutColorReducer.ts" />
 /// <reference path="test_common.ts"/>
 
 (function () {

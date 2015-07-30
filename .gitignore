@@ -1,1 +1,3 @@
-built/
+/.gradle/
+/built/
+/node_modules/
