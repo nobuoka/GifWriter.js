@@ -5,7 +5,7 @@
     "test": "./gradlew check"
   },
   "devDependencies": {
-    "mocha": "^2.2.5",
-    "typescript": "^1.5.3"
+    "mocha": "^2.3.4",
+    "typescript": "^1.6.2"
   }
 }
