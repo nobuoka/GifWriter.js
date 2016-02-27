@@ -10,19 +10,19 @@ node {
 
 task compileTypeScript(type: NodeTask, dependsOn: npmInstall) {
     script = file('node_modules/typescript/bin/tsc')
-    args = ['-p', 'src']
+    args = ['-p', 'src/main', '--outDir', './build/main/']
 }
 
 task assemble(dependsOn: compileTypeScript)
 
 task compileTestTypeScript(type: NodeTask, dependsOn: compileTypeScript) {
     script = file('node_modules/typescript/bin/tsc')
-    args = ['-p', 'test']
+    args = ['-p', 'src/test', '--outDir', './build/test/']
 }
 
 task test(type: NodeTask, dependsOn: compileTestTypeScript) {
     script = file('node_modules/mocha/bin/mocha')
-    args = ['-u', 'qunit', '-R', 'tap', 'built/tests.js']
+    args = ['-u', 'qunit', '-R', 'tap', './build/test/test/*.js']
 }
 
 task check(dependsOn: test)

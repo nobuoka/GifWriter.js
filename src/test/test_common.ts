@@ -3,7 +3,7 @@ declare var test: (desc: string, testFunc?: (done: () => void) => void) => void;
 declare var suite: (name: string) => void;
 
 var assert = require("assert");
-var t = {
+export default {
     module: suite,
     test: test,
     testAsync: function (description: string, testFunc: (done: () => void) => void) {

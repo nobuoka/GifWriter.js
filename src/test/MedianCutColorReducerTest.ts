@@ -1,5 +1,5 @@
-/// <reference path="..\src\MedianCutColorReducer.ts" />
-/// <reference path="test_common.ts"/>
+import {MedianCutColorReducer} from "../main/MedianCutColorReducer";
+import t from "./test_common";
 
 (function () {
 "use strict";
@@ -13,7 +13,7 @@ t.testAsync("2 colors to 2 colors", function (done) {
             0xFF,0xFF,0xFF,0x00, 0xFF,0xFF,0xFF,0x00,
         ],
     };
-    var reducer = new vividcode.image.MedianCutColorReducer(imageData, 2);
+    var reducer = new MedianCutColorReducer(imageData, 2);
     var paletteData = reducer.process();
     function indexToColorArray(index: number) {
         return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
@@ -34,7 +34,7 @@ t.testAsync("2 colors to 2 colors (4 colors max)", function (done) {
             0xFF,0xFF,0xFF,0x00, 0xFF,0xFF,0xFF,0x00,
         ],
     };
-    var reducer = new vividcode.image.MedianCutColorReducer(imageData, 4);
+    var reducer = new MedianCutColorReducer(imageData, 4);
     var paletteData = reducer.process();
     function indexToColorArray(index: number) {
         return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
@@ -55,7 +55,7 @@ t.testAsync("3 colors to 2 colors", function (done) {
             0x10,0x00,0x00,0x00, 0xFF,0x00,0x00,0x00,
         ],
     };
-    var reducer = new vividcode.image.MedianCutColorReducer(imageData, 2);
+    var reducer = new MedianCutColorReducer(imageData, 2);
     var paletteData = reducer.process();
     function indexToColorArray(index: number) {
         return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
