@@ -28,3 +28,12 @@ task test(type: NodeTask, dependsOn: compileTestTypeScript) {
 task check(dependsOn: test)
 
 task build(dependsOn: [assemble, check])
+
+task clean(type: Delete) {
+    delete './build'
+}
+
+task npmPublish(type: NpmTask, dependsOn: build) {
+    // See: https://docs.npmjs.com/cli/publish
+    args = ['publish']
+}
