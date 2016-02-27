@@ -1,0 +1,39 @@
+plugins {
+    id "com.moowork.node" version "0.11"
+}
+
+node {
+    version = '5.7.0'
+    npmVersion = '3.7.5'
+    download = true
+}
+
+task compileTypeScript(type: NodeTask, dependsOn: npmInstall) {
+    script = file('node_modules/typescript/bin/tsc')
+    args = ['-p', 'src/main', '--outDir', './build/main/']
+}
+
+task assemble(dependsOn: compileTypeScript)
+
+task compileTestTypeScript(type: NodeTask, dependsOn: compileTypeScript) {
+    script = file('node_modules/typescript/bin/tsc')
+    args = ['-p', 'src/test', '--outDir', './build/test/']
+}
+
+task test(type: NodeTask, dependsOn: compileTestTypeScript) {
+    script = file('node_modules/mocha/bin/mocha')
+    args = ['-u', 'qunit', '-R', 'tap', './build/test/test/*.js']
+}
+
+task check(dependsOn: test)
+
+task build(dependsOn: [assemble, check])
+
+task clean(type: Delete) {
+    delete './build'
+}
+
+task npmPublish(type: NpmTask, dependsOn: build) {
+    // See: https://docs.npmjs.com/cli/publish
+    args = ['publish']
+}

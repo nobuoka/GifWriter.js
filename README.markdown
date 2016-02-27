@@ -1,45 +1,38 @@
 GifWriter.js
 ====================
 
+[![Build Status](https://travis-ci.org/nobuoka/GifWriter.js.svg?branch=dev)](https://travis-ci.org/nobuoka/GifWriter.js)
+
 GIF (version 89a) Encoder written in TypeScript
 
 * [GIF89a spec](http://www.w3.org/Graphics/GIF/spec-gif89a.txt)
 
-Requirements
+Build system requirements
 ------------------------------
 
-To build GifWriter.js, following tools are needed:
+At first, you need to install Java Runtime Environment:
 
-* Build tool: [jake](https://npmjs.org/package/jake)
-* TypeScript Compiler: [tsc](http://www.typescriptlang.org/#Download)
-
-To run tests, following libraries are needed:
-
-* Mocha: [mocha](http://visionmedia.github.com/mocha/)
-
-These dependencies managed by [npm](https://npmjs.org/doc/README.html). (see: package.json)
+* [JRE](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
 Build and Test
 ------------------------------
 
-Jake, the build tool for Node.js is used.
-
 To build, execute:
 
 ````
-$ jake
+$ ./gradlew assemble
 ````
 
 To run all tests available on command line interface:
 
 ````
-$ jake test:all
+$ ./gradlew check
 ````
 
 To see all tasks:
 
 ````
-$ jake --tasks
+$ ./gradlew tasks
 ````
 
 License

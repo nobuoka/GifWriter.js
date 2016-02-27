@@ -1,12 +1,12 @@
-declare var require;
-declare var test;
-declare var suite;
+declare var require: (module: string) => any;
+declare var test: (desc: string, testFunc?: (done: () => void) => void) => void;
+declare var suite: (name: string) => void;
 
 var assert = require("assert");
-var t = {
+export default {
     module: suite,
     test: test,
-    testAsync: function (description, testFunc) {
+    testAsync: function (description: string, testFunc: (done: () => void) => void) {
         test(description, testFunc);
     },
     equal:    assert.equal,

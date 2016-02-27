@@ -1,9 +1,12 @@
+import {GifWriter, IndexedColorImage} from "../main/GifWriter";
+import t from "./test_common";
+
 (function () {
 "use strict";
 
 function createOutputStream() {
     return {
-        buffer: [],
+        buffer: <string[]>[],
         writeByte: function (b: number) {
             this.buffer.push(b);
         },
@@ -15,7 +18,7 @@ function createOutputStream() {
 
 t.testAsync("Write header of GIF89a", function (done) {
     var outputStream = createOutputStream();
-    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    var gifWriter = new GifWriter(outputStream);
     gifWriter.writeHeader();
     t.strictEqual(outputStream.buffer.length, 6, "Size of header is 6 bytes");
     t.deepEqual(String.fromCharCode.apply(String, outputStream.buffer.slice(0,3)), "GIF",
@@ -27,7 +30,7 @@ t.testAsync("Write header of GIF89a", function (done) {
 
 t.testAsync("Write logical screen info without color table", function (done) {
     var outputStream = createOutputStream();
-    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    var gifWriter = new GifWriter(outputStream);
     gifWriter.writeLogicalScreenInfo({ width: 2, height: 1 });
 
     t.strictEqual(outputStream.buffer.length, 7, "Size of logical screen descriptor is 7 bytes");
@@ -40,7 +43,7 @@ t.testAsync("Write logical screen info without color table", function (done) {
 
 t.testAsync("Write logical screen info with color table", function (done) {
     var outputStream = createOutputStream();
-    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    var gifWriter = new GifWriter(outputStream);
 
     var colorTableData = [0,1,2, 50,51,52, 253,254,255];
     gifWriter.writeLogicalScreenInfo({ width: 2, height: 1 }, { colorTableData: colorTableData });
@@ -55,8 +58,8 @@ t.testAsync("Write logical screen info with color table", function (done) {
 
 t.testAsync("Write table based image", function (done) {
     var outputStream = createOutputStream();
-    var gifWriter = new vividcode.image.GifWriter(outputStream);
-    var indexedColorImage = new vividcode.image.IndexedColorImage(
+    var gifWriter = new GifWriter(outputStream);
+    var indexedColorImage = new IndexedColorImage(
         { width: 2, height: 2 },
         [0,0,0,0],
         [0,0,0]
@@ -165,7 +168,7 @@ t.testAsync("Write table based image", function (done) {
 
 t.testAsync("Write Loop Control (Application Extension)", function (done) {
     var outputStream = createOutputStream();
-    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    var gifWriter = new GifWriter(outputStream);
     gifWriter.writeLoopControlInfo(0x100);
 
     t.deepEqual(outputStream.buffer,
@@ -183,7 +186,7 @@ t.testAsync("Write Loop Control (Application Extension)", function (done) {
 
 t.testAsync("Write trailer", function (done) {
     var outputStream = createOutputStream();
-    var gifWriter = new vividcode.image.GifWriter(outputStream);
+    var gifWriter = new GifWriter(outputStream);
     gifWriter.writeTrailer();
 
     t.strictEqual(outputStream.buffer.length, 1, "output 1 bytes");
