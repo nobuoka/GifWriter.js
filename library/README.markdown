@@ -5,7 +5,7 @@ GIF (version 89a) Encoder written in TypeScript.
 
 * [GIF89a spec](http://www.w3.org/Graphics/GIF/spec-gif89a.txt)
 
-This library provides both JavaScript modules and TypeScript declaration files.
+This library provides both JavaScript modules and TypeScript declaration files (`.d.ts` files).
 
 ## Classes
 
