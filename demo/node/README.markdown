@@ -12,3 +12,5 @@ To run this script, use follwing command.
 ```
 ../../gradlew runCreateGifFile
 ```
+
+Then, the `test.gif` file will be created.

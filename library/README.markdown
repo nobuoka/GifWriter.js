@@ -28,3 +28,10 @@ The `GifWriter` class writes an indexed color image data to an output stream.
 It uses the median cut algorithm.
 If you have a full color image data and you want to write it as GIF by using GifWriter,
 you must do color quantization by using this class (or by other way) first.
+
+## Example
+
+The `gif-writer` project provides a subproject to show how to use this module.
+Please see it.
+
+* [Example of `gif-writer` module for Node.js application](https://github.com/nobuoka/GifWriter.js/tree/master/demo/node)
