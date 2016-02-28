@@ -1,0 +1,35 @@
+plugins {
+    id "com.moowork.node" version "0.11"
+}
+
+node {
+    version = '5.7.0'
+    npmVersion = '3.7.5'
+    download = true
+}
+
+task tsTypingsInstall(type: NodeTask, dependsOn: npmInstall) {
+    script = file('node_modules/typings/dist/bin/typings')
+    args = ['install']
+    inputs.file file('typings.json')
+    outputs.dir file('typings')
+}
+
+task compileTypeScript(type: NodeTask, dependsOn: [npmInstall, tsTypingsInstall]) {
+    script = file('node_modules/typescript/bin/tsc')
+    args = ['-p', 'src/main', '--outDir', './build/main/']
+}
+
+task assemble(dependsOn: compileTypeScript)
+
+task check // do nothing
+
+task build(dependsOn: [assemble, check])
+
+task clean(type: Delete) {
+    delete './build'
+}
+
+task runCreateGifFile(type: NodeTask, dependsOn: assemble) {
+    script = file('build/main/create-gif-file.js')
+}
