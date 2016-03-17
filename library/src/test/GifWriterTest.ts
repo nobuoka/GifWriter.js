@@ -13,7 +13,7 @@ function createOutputStream() {
     };
 }
 
-t.testAsync("Write header of GIF89a", function (done) {
+t.testAsync("Write header of GIF89a", (done) => {
     var outputStream = createOutputStream();
     var gifWriter = new GifWriter(outputStream);
     gifWriter.writeHeader();
@@ -25,7 +25,7 @@ t.testAsync("Write header of GIF89a", function (done) {
     done();
 });
 
-t.testAsync("Write logical screen info without color table", function (done) {
+t.testAsync("Write logical screen info without color table", (done) => {
     var outputStream = createOutputStream();
     var gifWriter = new GifWriter(outputStream);
     gifWriter.writeLogicalScreenInfo({ width: 2, height: 1 });
@@ -38,7 +38,7 @@ t.testAsync("Write logical screen info without color table", function (done) {
     done();
 });
 
-t.testAsync("Write logical screen info with color table", function (done) {
+t.testAsync("Write logical screen info with color table", (done) => {
     var outputStream = createOutputStream();
     var gifWriter = new GifWriter(outputStream);
 
@@ -53,7 +53,7 @@ t.testAsync("Write logical screen info with color table", function (done) {
     done();
 });
 
-t.testAsync("Write table based image", function (done) {
+t.testAsync("Write table based image", (done) => {
     var outputStream = createOutputStream();
     var gifWriter = new GifWriter(outputStream);
     var indexedColorImage = new IndexedColorImage(
@@ -163,7 +163,7 @@ t.testAsync("Write table based image", function (done) {
     done();
 });
 
-t.testAsync("Write Loop Control (Application Extension)", function (done) {
+t.testAsync("Write Loop Control (Application Extension)", (done) => {
     var outputStream = createOutputStream();
     var gifWriter = new GifWriter(outputStream);
     gifWriter.writeLoopControlInfo(0x100);
@@ -181,7 +181,7 @@ t.testAsync("Write Loop Control (Application Extension)", function (done) {
     done();
 });
 
-t.testAsync("Write trailer", function (done) {
+t.testAsync("Write trailer", (done) => {
     var outputStream = createOutputStream();
     var gifWriter = new GifWriter(outputStream);
     gifWriter.writeTrailer();

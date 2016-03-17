@@ -1,7 +1,7 @@
 import {MedianCutColorReducer} from "../main/MedianCutColorReducer";
 import t from "./test_common";
 
-t.testAsync("2 colors to 2 colors", function (done) {
+t.testAsync("2 colors to 2 colors", (done) => {
     var imageData = {
         width: 2,
         height: 2,
@@ -43,7 +43,7 @@ t.testAsync("`Uint8CrampedArray` object can be used as image data.", (done) => {
     done();
 });
 
-t.testAsync("2 colors to 2 colors (4 colors max)", function (done) {
+t.testAsync("2 colors to 2 colors (4 colors max)", (done) => {
     var imageData = {
         width: 2,
         height: 2,
@@ -64,7 +64,7 @@ t.testAsync("2 colors to 2 colors (4 colors max)", function (done) {
     done();
 });
 
-t.testAsync("3 colors to 2 colors", function (done) {
+t.testAsync("3 colors to 2 colors", (done) => {
     var imageData = {
         width: 2,
         height: 2,
