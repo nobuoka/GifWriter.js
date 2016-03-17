@@ -3,19 +3,26 @@ GifWriter.js
 
 [![Build Status](https://travis-ci.org/nobuoka/GifWriter.js.svg?branch=dev)](https://travis-ci.org/nobuoka/GifWriter.js)
 
-GIF (version 89a) Encoder written in TypeScript
+GIF (version 89a) Encoder written in TypeScript.
 
 * [GIF89a spec](http://www.w3.org/Graphics/GIF/spec-gif89a.txt)
 
-Build system requirements
-------------------------------
+## For npm users
+
+This library is published to npm repository as `gif-writer`.
+Please see following page:
+
+* [gif-writer](https://www.npmjs.com/package/gif-writer)
+
+## For library developers
+
+### Build system requirements
 
 At first, you need to install Java Runtime Environment:
 
 * [JRE](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
-Build and Test
-------------------------------
+### Build and Test
 
 To build, execute:
 
@@ -35,7 +42,6 @@ To see all tasks:
 $ ./gradlew tasks
 ````
 
-License
-------------------------------
+## License
 
 This software is published under The MIT License.
