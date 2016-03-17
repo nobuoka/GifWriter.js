@@ -1,9 +1,6 @@
 import {GifWriter, IndexedColorImage} from "../main/GifWriter";
 import t from "./test_common";
 
-(function () {
-"use strict";
-
 function createOutputStream() {
     return {
         buffer: <string[]>[],
@@ -194,5 +191,3 @@ t.testAsync("Write trailer", function (done) {
         "First 1 byte is byte of Trailer");
     done();
 });
-
-}).call(this);

@@ -1,9 +1,6 @@
 import {MedianCutColorReducer} from "../main/MedianCutColorReducer";
 import t from "./test_common";
 
-(function () {
-"use strict";
-
 t.testAsync("2 colors to 2 colors", function (done) {
     var imageData = {
         width: 2,
@@ -87,4 +84,3 @@ t.testAsync("3 colors to 2 colors", function (done) {
         "Red is mapped to #8F0000");
     done();
 });
-}).call(this);
