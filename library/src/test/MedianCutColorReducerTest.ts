@@ -25,6 +25,27 @@ t.testAsync("2 colors to 2 colors", function (done) {
     done();
 });
 
+t.testAsync("`Uint8CrampedArray` object can be used as image data.", (done) => {
+    var imageData: ImageData = {
+        width: 2,
+        height: 2,
+        data: Uint8ClampedArray.from([
+            0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,
+            0xFF,0xFF,0xFF,0x00, 0xFF,0xFF,0xFF,0x00,
+        ]),
+    };
+    var reducer = new MedianCutColorReducer(imageData, 2);
+    var paletteData = reducer.process();
+    function indexToColorArray(index: number) {
+        return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
+    }
+    t.deepEqual(indexToColorArray(reducer.map(0x00,0x00,0x00)), [0x00,0x00,0x00],
+        "Black is mapped to black");
+    t.deepEqual(indexToColorArray(reducer.map(0xFF,0xFF,0xFF)), [0xFF,0xFF,0xFF],
+        "White is mapped to white");
+    done();
+});
+
 t.testAsync("2 colors to 2 colors (4 colors max)", function (done) {
     var imageData = {
         width: 2,

@@ -1,8 +1,9 @@
-// same interface that `ImageData` interface of HTML standard
+// This interface corresponds to `ImageData` interface of HTML standard.
+// See: https://html.spec.whatwg.org/multipage/scripting.html#imagedata
 export interface IImageData {
     width: number;
     height: number;
-    data: number[];
+    data: Uint8ClampedArray | number[];
 }
 
 // Partition-based general selection algorithm
