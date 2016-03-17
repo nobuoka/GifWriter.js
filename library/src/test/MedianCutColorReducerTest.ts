@@ -1,6 +1,10 @@
 import {MedianCutColorReducer} from "../main/MedianCutColorReducer";
 import t from "./test_common";
 
+function indexToColorArray(paletteData: number[], index: number): [number, number, number] {
+    return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
+}
+
 t.testAsync("2 colors to 2 colors", (done) => {
     var imageData = {
         width: 2,
@@ -12,12 +16,9 @@ t.testAsync("2 colors to 2 colors", (done) => {
     };
     var reducer = new MedianCutColorReducer(imageData, 2);
     var paletteData = reducer.process();
-    function indexToColorArray(index: number) {
-        return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
-    }
-    t.deepEqual(indexToColorArray(reducer.map(0x00,0x00,0x00)), [0x00,0x00,0x00],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0x00,0x00,0x00)), [0x00,0x00,0x00],
         "Black is mapped to black");
-    t.deepEqual(indexToColorArray(reducer.map(0xFF,0xFF,0xFF)), [0xFF,0xFF,0xFF],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0xFF,0xFF,0xFF)), [0xFF,0xFF,0xFF],
         "White is mapped to white");
     done();
 });
@@ -33,12 +34,9 @@ t.testAsync("`Uint8CrampedArray` object can be used as image data.", (done) => {
     };
     var reducer = new MedianCutColorReducer(imageData, 2);
     var paletteData = reducer.process();
-    function indexToColorArray(index: number) {
-        return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
-    }
-    t.deepEqual(indexToColorArray(reducer.map(0x00,0x00,0x00)), [0x00,0x00,0x00],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0x00,0x00,0x00)), [0x00,0x00,0x00],
         "Black is mapped to black");
-    t.deepEqual(indexToColorArray(reducer.map(0xFF,0xFF,0xFF)), [0xFF,0xFF,0xFF],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0xFF,0xFF,0xFF)), [0xFF,0xFF,0xFF],
         "White is mapped to white");
     done();
 });
@@ -54,12 +52,9 @@ t.testAsync("2 colors to 2 colors (4 colors max)", (done) => {
     };
     var reducer = new MedianCutColorReducer(imageData, 4);
     var paletteData = reducer.process();
-    function indexToColorArray(index: number) {
-        return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
-    }
-    t.deepEqual(indexToColorArray(reducer.map(0x00,0x00,0x00)), [0x00,0x00,0x00],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0x00,0x00,0x00)), [0x00,0x00,0x00],
         "Black is mapped to black");
-    t.deepEqual(indexToColorArray(reducer.map(0xFF,0xFF,0xFF)), [0xFF,0xFF,0xFF],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0xFF,0xFF,0xFF)), [0xFF,0xFF,0xFF],
         "White is mapped to white");
     done();
 });
@@ -75,12 +70,9 @@ t.testAsync("3 colors to 2 colors", (done) => {
     };
     var reducer = new MedianCutColorReducer(imageData, 2);
     var paletteData = reducer.process();
-    function indexToColorArray(index: number) {
-        return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
-    }
-    t.deepEqual(indexToColorArray(reducer.map(0x00,0x00,0x00)), [0x08,0x00,0x00],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0x00,0x00,0x00)), [0x08,0x00,0x00],
         "Black is mapped to #080000");
-    t.deepEqual(indexToColorArray(reducer.map(0xFF,0x00,0x00)), [0x8F,0x00,0x00],
+    t.deepEqual(indexToColorArray(paletteData, reducer.map(0xFF,0x00,0x00)), [0x8F,0x00,0x00],
         "Red is mapped to #8F0000");
     done();
 });
