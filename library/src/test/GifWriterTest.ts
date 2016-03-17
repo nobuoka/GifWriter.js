@@ -1,16 +1,17 @@
-import {GifWriter, IndexedColorImage} from "../main/GifWriter";
+import {GifWriter, IndexedColorImage, IOutputStream} from "../main/GifWriter";
 import t from "./test_common";
 
-function createOutputStream() {
-    return {
-        buffer: <string[]>[],
-        writeByte: function (b: number) {
-            this.buffer.push(b);
-        },
-        writeBytes: function (bb: number[]) {
-            Array.prototype.push.apply(this.buffer, bb);
-        },
-    };
+class TestOutputStream implements IOutputStream {
+    buffer: number[] = [];
+    writeByte(b: number) {
+        this.buffer.push(b);
+    }
+    writeBytes(bb: number[]) {
+        Array.prototype.push.apply(this.buffer, bb);
+    }
+}
+function createOutputStream(): TestOutputStream {
+    return new TestOutputStream();
 }
 
 t.testAsync("Write header of GIF89a", (done) => {
