@@ -27,7 +27,7 @@ function partition(a: number[], left: number, right: number, pivotIndex: number)
     swap(a, right, storeIndex);
     return storeIndex
 }
-function selectKthElem(list: number[], left: number, right: number, k: number) {
+function selectKthElem(list: number[], left: number, right: number, k: number): number {
     while (true) {
         // select pivotIndex between left and right
         var pivotIndex = Math.floor((right + left) / 2);
@@ -72,6 +72,7 @@ function searchClosestColorIndex(color: IColor, palette: IColor[]) {
     return (found ? foundIndex : closestIndex);
 }
 
+type ColorName = "red" | "blue" | "green";
 export interface IColor {
     red: number;
     blue: number;
@@ -111,14 +112,14 @@ class ColorCube {
         this.__maxB = maxB;
     }
 
-    divide() {
+    divide(): ColorCube[] {
         var cut = this.largestEdge()
         var med = this.median(cut)
         var r = this.divideBy(cut, med)
         return r;
     }
 
-    divideBy(cutTargetColor: string, median: number) {
+    divideBy(cutTargetColor: ColorName, median: number) {
         var list0: IColor[] = [];
         var list1: IColor[] = [];
         this.colors.forEach((c) => {
@@ -135,7 +136,7 @@ class ColorCube {
         }
     }
 
-    median(cutTargetColor: string) {
+    median(cutTargetColor: ColorName): number {
         var cc: number[] = [];
         var colors = this.colors;
         for (var i = 0, len = colors.length; i < len; ++i) {
@@ -145,7 +146,7 @@ class ColorCube {
         return med2;
     }
 
-    largestEdge() {
+    largestEdge(): ColorName {
         var diffR = (this.__maxR - this.__minR) * 1.0;
         var diffG = (this.__maxG - this.__minG) * 0.8;
         var diffB = (this.__maxB - this.__minB) * 0.5;
