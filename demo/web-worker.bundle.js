@@ -57,7 +57,7 @@
 	    OutputStream.prototype.writeBytes = function (bb) { Array.prototype.push.apply(this.buffer, bb); };
 	    return OutputStream;
 	}());
-	this.onmessage = function (evt) {
+	self.onmessage = function (evt) {
 	    var msg = evt.data;
 	    var imageDataList = msg.imageDataList;
 	    var paletteSize = msg.paletteSize;
@@ -76,7 +76,7 @@
 	    });
 	    gifWriter.writeTrailer();
 	    var gifDataStr = os.buffer.map(function (b) { return String.fromCharCode(b); }).join("");
-	    this.postMessage({ gifDataStr: gifDataStr });
+	    self.postMessage({ gifDataStr: gifDataStr });
 	};
 	function convertImgDataToIndexedColorImage(imgData, paletteSize) {
 	    var reducer = new MedianCutColorReducer(imgData, paletteSize);
