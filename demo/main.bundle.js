@@ -44,12 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	/*
-	declare var require: (moduleName: string) => any;
-	var MyWorker = require("worker!./web-worker.js");
-	var worker = <Worker>new MyWorker();
-	*/
-	var worker = new Worker("./web-worker.bundle.js");
+	var worker = new Worker("./demo/web-worker.bundle.js");
 	var IMG_SIZE = 128;
 	var workingSpaceElem;
 	var imageDataList;
