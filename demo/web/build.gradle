@@ -1,0 +1,59 @@
+plugins {
+    id "com.moowork.node" version "0.11"
+}
+
+node {
+    version = '5.7.0'
+    npmVersion = '3.7.5'
+    download = true
+}
+
+task tsTypingsInstall(type: NodeTask, dependsOn: npmInstall) {
+    /*
+    script = file('node_modules/typings/dist/bin/typings')
+    args = ['install']
+    inputs.file file('typings.json')
+    outputs.dir file('typings')
+    */
+}
+
+task clean(type: Delete) {
+    delete './build'
+}
+
+task compileTypeScript(type: NodeTask, dependsOn: [npmInstall/*, tsTypingsInstall*/]) {
+    script = file('node_modules/typescript/bin/tsc')
+    String srcDir = 'src/ts'
+    String outDir = 'build/typescript'
+    args = ['-p', srcDir, '--outDir', outDir]
+    inputs.sourceDir srcDir
+    outputs.dir outDir
+}
+
+task webpack(type: NodeTask, dependsOn: [npmInstall, compileTypeScript]) {
+    script = file('node_modules/webpack/bin/webpack')
+    inputs.sourceDir 'build/typescript'
+    outputs.dir 'build/webpack'
+}
+task webpackClean(type: Delete) { delete 'build/webpack' }
+clean.dependsOn webpackClean
+
+task ghPagesRawFiles(type: Copy) {
+    from 'src/rawFiles/'
+    into 'build/gh-pages/'
+}
+task ghPagesJavaScript(type: Copy, dependsOn: webpack) {
+    from 'build/webpack/'
+    into 'build/gh-pages/demo'
+}
+task ghPages(dependsOn: [ghPagesRawFiles, ghPagesJavaScript])
+
+task assemble(dependsOn: webpack)
+
+task check // do nothing
+
+task build(dependsOn: [assemble, check])
+
+task runCreateGifFile(type: NodeTask, dependsOn: assemble) {
+    script = file('build/main/create-gif-file.js')
+}
