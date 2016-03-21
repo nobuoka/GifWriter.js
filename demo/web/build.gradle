@@ -48,7 +48,7 @@ task ghPagesJavaScript(type: Copy, dependsOn: webpack) {
 }
 task ghPages(dependsOn: [ghPagesRawFiles, ghPagesJavaScript])
 
-task assemble(dependsOn: webpack)
+task assemble(dependsOn: ghPages)
 
 task check // do nothing
 
@@ -56,4 +56,33 @@ task build(dependsOn: [assemble, check])
 
 task runCreateGifFile(type: NodeTask, dependsOn: assemble) {
     script = file('build/main/create-gif-file.js')
+}
+
+task commitToGhPagesBranch(dependsOn: build) << {
+    sh 'git add -f ./build/gh-pages'
+    String treeObjId =
+            sh('git write-tree --prefix=demo/web/build/gh-pages', doChomp: true)
+    String commitMessage = "Built on `:demo:web` project at ${new Date()}"
+    String commitId =
+            sh("git commit-tree -p gh-pages -m \"${commitMessage}\" ${treeObjId}", doChomp: true)
+    sh "git update-ref refs/heads/gh-pages ${commitId}"
+    sh 'git reset -- ./build/gh-pages'
+}
+
+def sh(Map opts = [:], String command) {
+    Process p = command.execute(null, project.projectDir)
+    try {
+        p.waitFor()
+        if (p.exitValue() == 0) {
+            String res = p.text
+            return opts.doChomp ? res.replaceFirst(/(?:\r\n|\n|\r)\z/, '') : res
+        } else {
+            String errText = p.err.text
+            throw new RuntimeException(
+                    'Error occurred on command execution ' +
+                    "(command: ${command}, exit code: ${p.exitValue()}, text: ${errText}")
+        }
+    } finally {
+        p.closeStreams()
+    }
 }
