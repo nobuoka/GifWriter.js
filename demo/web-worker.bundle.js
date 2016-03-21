@@ -63,9 +63,7 @@
 	    var paletteSize = msg.paletteSize;
 	    var delayTimeInMS = msg.delayTimeInMS;
 	    var IMG_SIZE = msg.imageSize;
-	    var indexedColorImages = imageDataList.map(function (e) {
-	        return convertImgDataToIndexedColorImage(e, paletteSize);
-	    });
+	    var indexedColorImages = imageDataList.map(function (e) { return convertImgDataToIndexedColorImage(e, paletteSize); });
 	    var os = new OutputStream();
 	    var gifWriter = new GifWriter(os);
 	    gifWriter.writeHeader();

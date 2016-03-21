@@ -44,6 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
+	"use strict";
 	var worker = new Worker("./demo/web-worker.bundle.js");
 	var IMG_SIZE = 128;
 	var workingSpaceElem;
@@ -73,9 +74,7 @@
 	        }
 	        catch (err) { }
 	        return d;
-	    }).filter(function (e) {
-	        return !!e;
-	    });
+	    }).filter(function (e) { return !!e; });
 	    if (imageDataList.length === 0) {
 	        alert("No image could be loaded...");
 	        return;
@@ -100,22 +99,6 @@
 	    var delayTimeInputElem = document.getElementById("delay-time-input");
 	    var resultContElem = document.getElementById("result-container");
 	    resultContElem.insertBefore(createProgressMessageElem(), resultContElem.firstChild);
-	    worker.onmessage = function (evt) {
-	        var msg = evt.data;
-	        var imgElem = document.createElement("img");
-	        var base64Str = btoa(msg.gifDataStr);
-	        imgElem.src = "data:image/gif;base64," + base64Str;
-	        var e = resultContElem.firstChild;
-	        while (e && e.tagName === "SPAN") {
-	            e = e.nextSibling;
-	        }
-	        resultContElem.insertBefore(imgElem, e);
-	        if (resultContElem.firstChild.tagName === "SPAN")
-	            resultContElem.removeChild(resultContElem.firstChild);
-	    };
-	    worker.onerror = function (err) {
-	        alert(err);
-	    };
 	    var paletteSize = parseInt(paletteSizeInputElem.value);
 	    if (!(1 <= paletteSize && paletteSize <= 255))
 	        paletteSize = 255;
@@ -128,6 +111,23 @@
 	        paletteSize: paletteSize,
 	        delayTimeInMS: delayTime
 	    });
+	};
+	worker.onmessage = function (evt) {
+	    var resultContElem = document.getElementById("result-container");
+	    var msg = evt.data;
+	    var imgElem = document.createElement("img");
+	    var base64Str = btoa(msg.gifDataStr);
+	    imgElem.src = "data:image/gif;base64," + base64Str;
+	    var e = resultContElem.firstChild;
+	    while (e && e.tagName === "SPAN") {
+	        e = e.nextSibling;
+	    }
+	    resultContElem.insertBefore(imgElem, e);
+	    if (resultContElem.firstChild.tagName === "SPAN")
+	        resultContElem.removeChild(resultContElem.firstChild);
+	};
+	worker.onerror = function (err) {
+	    alert(err);
 	};
 
 
