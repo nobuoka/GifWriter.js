@@ -33,6 +33,10 @@ task clean(type: Delete) {
     delete './build'
 }
 
+task npmPack(type: NpmTask, dependsOn: build) {
+    args = ['pack']
+}
+
 task npmPublish(type: NpmTask, dependsOn: build) {
     // See: https://docs.npmjs.com/cli/publish
     args = ['publish']
