@@ -1,10 +1,10 @@
 plugins {
-    id "com.moowork.node" version "0.11"
+    id "com.moowork.node" version "1.2.0"
 }
 
 node {
-    version = '5.7.0'
-    npmVersion = '3.7.5'
+    version = '9.5.0'
+    npmVersion = '5.6.0'
     download = true
 }
 
@@ -26,13 +26,13 @@ task compileTypeScript(type: NodeTask, dependsOn: [npmInstall/*, tsTypingsInstal
     String srcDir = 'src/ts'
     String outDir = 'build/typescript'
     args = ['-p', srcDir, '--outDir', outDir]
-    inputs.sourceDir srcDir
+    inputs.dir srcDir
     outputs.dir outDir
 }
 
 task webpack(type: NodeTask, dependsOn: [npmInstall, compileTypeScript]) {
     script = file('node_modules/webpack/bin/webpack')
-    inputs.sourceDir 'build/typescript'
+    inputs.dir 'build/typescript'
     outputs.dir 'build/webpack'
 }
 task webpackClean(type: Delete) { delete 'build/webpack' }
