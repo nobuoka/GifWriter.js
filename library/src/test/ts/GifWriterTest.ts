@@ -1,4 +1,4 @@
-import {GifWriter, IndexedColorImage, IOutputStream} from "../main/GifWriter";
+import {GifWriter, IndexedColorImage, IOutputStream} from "main";
 import t from "./test_common";
 
 class TestOutputStream implements IOutputStream {

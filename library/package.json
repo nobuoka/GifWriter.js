@@ -1,28 +1,12 @@
 {
-  "name": "gif-writer",
-  "version": "0.9.3",
-  "description": "GIF (version 89a) Encoder written in TypeScript.",
-  "keywords": [
-    "GIF"
-  ],
-  "homepage": "http://nobuoka.github.io/GifWriter.js/",
-  "bugs": {
-    "url": "https://github.com/nobuoka/GifWriter.js/issues"
-  },
+  "name": "gif-writer-dev",
+  "private": true,
+  "description": "For git-writer developers",
   "repository": {
     "type": "git",
     "url": "https://github.com/nobuoka/GifWriter.js.git"
   },
   "license": "MIT",
-  "author": {
-    "name": "Nobuoka Yu",
-    "url": "https://github.com/nobuoka"
-  },
-  "files": [
-    "build/main"
-  ],
-  "main": "./build/main/gif-writer.js",
-  "typings": "./build/main/gif-writer.d.ts",
   "scripts": {
     "test": "./gradlew check"
   },
