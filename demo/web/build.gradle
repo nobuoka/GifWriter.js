@@ -58,15 +58,17 @@ task runCreateGifFile(type: NodeTask, dependsOn: assemble) {
     script = file('build/main/create-gif-file.js')
 }
 
-task commitToGhPagesBranch(dependsOn: build) << {
-    sh 'git add -f ./build/gh-pages'
-    String treeObjId =
-            sh('git write-tree --prefix=demo/web/build/gh-pages', doChomp: true)
-    String commitMessage = "Built on `:demo:web` project at ${new Date()}"
-    String commitId =
-            sh("git commit-tree -p gh-pages -m \"${commitMessage}\" ${treeObjId}", doChomp: true)
-    sh "git update-ref refs/heads/gh-pages ${commitId}"
-    sh 'git reset -- ./build/gh-pages'
+task commitToGhPagesBranch(dependsOn: build) {
+    doLast {
+        sh 'git add -f ./build/gh-pages'
+        String treeObjId =
+                sh('git write-tree --prefix=demo/web/build/gh-pages', doChomp: true)
+        String commitMessage = "Built on `:demo:web` project at ${new Date()}"
+        String commitId =
+                sh("git commit-tree -p gh-pages -m \"${commitMessage}\" ${treeObjId}", doChomp: true)
+        sh "git update-ref refs/heads/gh-pages ${commitId}"
+        sh 'git reset -- ./build/gh-pages'
+    }
 }
 
 def sh(Map opts = [:], String command) {
