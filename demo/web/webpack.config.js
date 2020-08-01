@@ -4,7 +4,7 @@ module.exports = {
         "web-worker": "./build/typescript/web-worker.js",
     },
     output: {
-        path: "build/webpack/",
+        path: __dirname + "/build/webpack/",
         filename: "[name].bundle.js",
     },
 };
