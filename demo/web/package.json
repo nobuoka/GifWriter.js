@@ -6,7 +6,6 @@
   },
   "devDependencies": {
     "typescript": "^3.9.7",
-    "webpack": "^1.12.14",
-    "worker-loader": "^0.7.0"
+    "webpack": "^1.12.14"
   }
 }
