@@ -8,20 +8,11 @@ node {
     download = true
 }
 
-task tsTypingsInstall(type: NodeTask, dependsOn: npmInstall) {
-    /*
-    script = file('node_modules/typings/dist/bin/typings')
-    args = ['install']
-    inputs.file file('typings.json')
-    outputs.dir file('typings')
-    */
-}
-
 task clean(type: Delete) {
     delete './build'
 }
 
-task compileTypeScript(type: NodeTask, dependsOn: [npmInstall/*, tsTypingsInstall*/]) {
+task compileTypeScript(type: NodeTask, dependsOn: [npmInstall]) {
     script = file('node_modules/typescript/bin/tsc')
     String srcDir = 'src/ts'
     String outDir = 'build/typescript'
@@ -53,10 +44,6 @@ task assemble(dependsOn: ghPages)
 task check // do nothing
 
 task build(dependsOn: [assemble, check])
-
-task runCreateGifFile(type: NodeTask, dependsOn: assemble) {
-    script = file('build/main/create-gif-file.js')
-}
 
 task commitToGhPagesBranch(dependsOn: build) {
     doLast {
