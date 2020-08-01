@@ -5,7 +5,7 @@
     "gif-writer": "0.9.3"
   },
   "devDependencies": {
-    "typescript": "^1.8.2",
-    "typings": "0.6.8"
+    "typescript": "^3.9.7",
+    "@types/node": "^12"
   }
 }
