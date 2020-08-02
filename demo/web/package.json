@@ -1,7 +1,7 @@
 {
   "private": true,
   "dependencies": {
-    "gif-writer": "0.9.3"
+    "gif-writer": "^0.9.4"
   },
   "devDependencies": {
     "typescript": "^3.9.7",
