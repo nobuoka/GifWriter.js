@@ -2,6 +2,8 @@ GifWriter.js
 ====================
 
 [![Build Status](https://travis-ci.org/nobuoka/GifWriter.js.svg?branch=dev)](https://travis-ci.org/nobuoka/GifWriter.js)
+[![CircleCI](https://circleci.com/gh/nobuoka/GifWriter.js.svg?style=svg)](https://circleci.com/gh/nobuoka/GifWriter.js)
+[![codecov](https://codecov.io/gh/nobuoka/GifWriter.js/branch/dev/graph/badge.svg)](https://codecov.io/gh/nobuoka/GifWriter.js)
 
 GIF (version 89a) Encoder written in TypeScript.
 
