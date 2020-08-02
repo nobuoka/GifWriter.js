@@ -10,20 +10,20 @@ node {
 
 task compileTypeScript(type: NodeTask, dependsOn: npmInstall) {
     script = file('node_modules/typescript/bin/tsc')
-    args = ['-p', 'src/main/ts', '--outDir', './build/node_modules/main/']
+    args = ['-p', 'src/ts', '--outDir', './build']
 }
 
 task copyRawFiles(type: Copy) {
-    from 'src/main/raw'
+    from 'src/raw'
     from 'CHANGELOG.markdown'
-    into './build/node_modules/main'
+    into './build'
 }
 
 task assemble(dependsOn: [compileTypeScript, copyRawFiles])
 
 task test(type: NodeTask, dependsOn: compileTypeScript) {
     script = file('node_modules/mocha/bin/mocha')
-    args = ['-u', 'qunit', '-R', 'tap', './build/node_modules/main/*.test.js']
+    args = ['-u', 'qunit', '-R', 'tap', './build/*.test.js']
 }
 
 task check(dependsOn: test)
@@ -35,10 +35,10 @@ task clean(type: Delete) {
 }
 
 task npmPack(type: NpmTask, dependsOn: build) {
-    args = ['pack', './build/node_modules/main']
+    args = ['pack', './build']
 }
 
 task npmPublish(type: NpmTask, dependsOn: build) {
     // See: https://docs.npmjs.com/cli/publish
-    args = ['publish', './build/node_modules/main']
+    args = ['publish', './build']
 }
