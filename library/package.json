@@ -3,6 +3,6 @@
   "description": "For git-writer developers",
   "devDependencies": {
     "typescript": "^3.9.7",
-    "mocha": "^5.0.0"
+    "mocha": "^8.1.0"
   }
 }
