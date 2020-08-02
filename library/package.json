@@ -2,7 +2,14 @@
   "private": true,
   "description": "For git-writer developers",
   "devDependencies": {
-    "typescript": "^3.9.7",
-    "mocha": "^8.1.0"
+    "codecov": "^3.7.2",
+    "mocha": "^8.1.0",
+    "nyc": "^15.1.0",
+    "typescript": "^3.9.7"
+  },
+  "scripts": {
+    "test": "nyc _mocha -u qunit -R tap ./build/*.test.js",
+    "tsc": "tsc -p src/ts --outDir ./build",
+    "codecov": "nyc report --reporter=lcovonly && codecov --root=../"
   }
 }

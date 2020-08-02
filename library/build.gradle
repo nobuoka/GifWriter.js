@@ -8,9 +8,8 @@ node {
     download = true
 }
 
-task compileTypeScript(type: NodeTask, dependsOn: npmInstall) {
-    script = file('node_modules/typescript/bin/tsc')
-    args = ['-p', 'src/ts', '--outDir', './build']
+task compileTypeScript(type: NpmTask, dependsOn: npmInstall) {
+    args = ["run", "tsc"]
 }
 
 task copyRawFiles(type: Copy) {
@@ -21,9 +20,8 @@ task copyRawFiles(type: Copy) {
 
 task assemble(dependsOn: [compileTypeScript, copyRawFiles])
 
-task test(type: NodeTask, dependsOn: compileTypeScript) {
-    script = file('node_modules/istanbul/bin/istanbul')
-    args = ['cover', 'node_modules/mocha/bin/_mocha', '--', '-u', 'qunit', '-R', 'tap', './build/*.test.js']
+task test(type: NpmTask, dependsOn: compileTypeScript) {
+    args = ["test"]
 }
 
 task check(dependsOn: test)
@@ -32,6 +30,10 @@ task build(dependsOn: [assemble, check])
 
 task clean(type: Delete) {
     delete './build'
+}
+
+task uploadTestCoverage(type: NpmTask, dependsOn: test) {
+    args = ["run", "codecov"]
 }
 
 task npmPack(type: NpmTask, dependsOn: build) {
