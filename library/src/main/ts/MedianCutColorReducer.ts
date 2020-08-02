@@ -1,3 +1,5 @@
+import {selectKthElem} from "./Selection";
+
 // This interface corresponds to `ImageData` interface of HTML standard.
 // See: https://html.spec.whatwg.org/multipage/scripting.html#imagedata
 export interface IImageData {
@@ -6,48 +8,6 @@ export interface IImageData {
     data: Uint8ClampedArray | number[];
 }
 
-// Partition-based general selection algorithm
-// see : http://en.wikipedia.org/wiki/Selection_algorithm
-
-function swap(array: number[], idx1: number, idx2: number) {
-    var tmp = array[idx1];
-    array[idx1] = array[idx2];
-    array[idx2] = tmp;
-}
-function partition(a: number[], left: number, right: number, pivotIndex: number) {
-    var pivotValue = a[pivotIndex];
-    swap(a, pivotIndex, right);
-    var storeIndex = left;
-    for (var i = left; i < right; ++i) {
-        if (a[i] <= pivotValue) {
-            swap(a, storeIndex, i);
-            storeIndex = storeIndex + 1;
-        }
-    }
-    swap(a, right, storeIndex);
-    return storeIndex
-}
-function selectKthElem(list: number[], left: number, right: number, k: number): number {
-    while (true) {
-        // select pivotIndex between left and right
-        var pivotIndex = Math.floor((right + left) / 2);
-        var pivotNewIndex = partition(list, left, right, pivotIndex);
-        var pivotDist = pivotNewIndex - left + 1;
-        if (k === pivotDist) {
-            return list[pivotNewIndex];
-        } else if (k < pivotDist) {
-            right = pivotNewIndex - 1;
-        } else {
-            k = k - pivotDist;
-            left = pivotNewIndex + 1;
-        }
-    }
-}
-
-function searchClosestColor(color: IColor, palette: IColor[]) {
-    var idx = searchClosestColorIndex(color, palette);
-    return palette[idx];
-}
 function searchClosestColorIndex(color: IColor, palette: IColor[]) {
     var min = 0;
     var found = false;
@@ -142,7 +102,7 @@ class ColorCube {
         for (var i = 0, len = colors.length; i < len; ++i) {
             cc.push((<any>(colors[i]))[cutTargetColor]);
         }
-        var med2 = selectKthElem(cc, 0, cc.length - 1, Math.floor(cc.length / 2) + 1);
+        var med2 = selectKthElem(cc, Math.floor(cc.length / 2) + 1);
         return med2;
     }
 
