@@ -97,9 +97,9 @@ function compressWithLZW(actualCodes: number[], numBits: number) {
     // encoder for an image. The value of this code is <Clear code>+1.
     var endOfInfoCode = clearCode + 1;
 
-    var nextCode: number;
-    var curNumCodeBits: number;
-    var dict: { [key: string]: number; };
+    var nextCode: number = 0;
+    var curNumCodeBits: number = 0;
+    var dict: { [key: string]: number; } = Object.create(null);
     function resetAllParamsAndTablesToStartUpState() {
         // GIF spec says: The first available compression code value is <Clear code>+2.
         nextCode = endOfInfoCode + 1;
@@ -138,6 +138,13 @@ function compressWithLZW(actualCodes: number[], numBits: number) {
     return bb.flush();
 }
 
+/**
+ * This class writes an indexed color image data to an output stream.
+ *
+ * * An indexed color image data is represented with an object which has `IIndexedColorImage` interface.
+ *   The `IndexedColorImage` implements this interface.
+ * * An output stream is represented with an object which has `IOutputStream` interface.
+ */
 export class GifWriter {
     private __os: IOutputStream;
     constructor(outputStream: IOutputStream) {
@@ -194,11 +201,11 @@ export class GifWriter {
     writeLogicalScreenInfo(imageSize: IImageSize, options?: IGifLogicalScreenInfoOptions) {
         if (!options) options = {};
         var sizeOfColorTable =
-            "sizeOfColorTable" in options ? options.sizeOfColorTable :
-            options.colorTableData ? this.__calcSizeOfColorTable(options.colorTableData) :
-                                    7; // 256 colors
-        var bgColorIndex = ("bgColorIndex" in options ? options.bgColorIndex : 0);
-        var pxAspectRatio = ("pxAspectRatio" in options ? options.pxAspectRatio : 0);
+                options.sizeOfColorTable ??
+                (options.colorTableData ? this.__calcSizeOfColorTable(options.colorTableData) :
+                7); // 256 colors
+        var bgColorIndex = (options.bgColorIndex ?? 0);
+        var pxAspectRatio = (options.pxAspectRatio ?? 0);
         this.__writeLogicalScreenDescriptor(
             imageSize, !!options.colorTableData, !!options.colorTableSortFlag,
             sizeOfColorTable, bgColorIndex, pxAspectRatio);
@@ -264,11 +271,11 @@ export class GifWriter {
         os.writeByte(0x2C);
         // Image Left Position (2 Bytes) : Column number, in pixels, of the left edge
         //           of the image, with respect to the left edge of the Logical Screen.
-        var leftPos = ("leftPosition" in opts ? opts.leftPosition : 0);
+        var leftPos = (opts?.leftPosition ?? 0);
         this.__writeInt2(leftPos);
         // Image Top Position (2 Bytes) : Row number, in pixels, of the top edge of
         //           the image with respect to the top edge of the Logical Screen.
-        var topPos = ("topPosition" in opts ? opts.topPosition : 0);
+        var topPos = (opts?.topPosition ?? 0);
         this.__writeInt2(topPos);
         // Image Width (2 Bytes) and Height (2 bytes)
         this.__writeInt2(indexedColorImage.width);
@@ -315,11 +322,11 @@ export class GifWriter {
     private __writeGraphicControlExtension(options?: IGifExtendedImageOptions) {
         if (!options) options = {};
         var os = this.__os;
-        var delay = Math.round((options.delayTimeInMS || 0) / 10);
-        var disposalMethod = ("disposalMethod" in options ? options.disposalMethod : 2);
+        var delay = Math.round((options.delayTimeInMS ?? 0) / 10);
+        var disposalMethod = (options.disposalMethod ?? 2);
         var transparentColorIndex: number;
         var transparentColorFlag: number;
-        if (options.transparentColorIndex >= 0) {
+        if (options.transparentColorIndex !== undefined && options.transparentColorIndex >= 0) {
             transparentColorIndex = options.transparentColorIndex & 0xFF;
             transparentColorFlag = 1;
         } else {

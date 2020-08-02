@@ -1,28 +1,29 @@
 plugins {
-    id "com.moowork.node" version "0.11"
+    id "com.moowork.node" version "1.3.1"
 }
 
 node {
-    version = '5.7.0'
-    npmVersion = '3.7.5'
+    version = '12.18.3'
+    npmVersion = '6.14.7'
     download = true
 }
 
 task compileTypeScript(type: NodeTask, dependsOn: npmInstall) {
     script = file('node_modules/typescript/bin/tsc')
-    args = ['-p', 'src/main', '--outDir', './build/main/']
+    args = ['-p', 'src/ts', '--outDir', './build']
 }
 
-task assemble(dependsOn: compileTypeScript)
-
-task compileTestTypeScript(type: NodeTask, dependsOn: compileTypeScript) {
-    script = file('node_modules/typescript/bin/tsc')
-    args = ['-p', 'src/test', '--outDir', './build/test/']
+task copyRawFiles(type: Copy) {
+    from 'src/raw'
+    from 'CHANGELOG.markdown'
+    into './build'
 }
 
-task test(type: NodeTask, dependsOn: compileTestTypeScript) {
+task assemble(dependsOn: [compileTypeScript, copyRawFiles])
+
+task test(type: NodeTask, dependsOn: compileTypeScript) {
     script = file('node_modules/mocha/bin/mocha')
-    args = ['-u', 'qunit', '-R', 'tap', './build/test/test/*.js']
+    args = ['-u', 'qunit', '-R', 'tap', './build/*.test.js']
 }
 
 task check(dependsOn: test)
@@ -34,10 +35,10 @@ task clean(type: Delete) {
 }
 
 task npmPack(type: NpmTask, dependsOn: build) {
-    args = ['pack']
+    args = ['pack', './build']
 }
 
 task npmPublish(type: NpmTask, dependsOn: build) {
     // See: https://docs.npmjs.com/cli/publish
-    args = ['publish']
+    args = ['publish', './build']
 }

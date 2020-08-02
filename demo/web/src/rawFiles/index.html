@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>gif-writer — GIF Encoder (TypeScript, JavaScript)</title>
+  </head>
+  <body>
+    <h1>gif-writer — GIF Encoder</h1>
+    <section>
+      <h2>npm repository</h2>
+      <ul>
+        <li><a href="https://www.npmjs.com/package/gif-writer">gif-writer</a></li>
+      </ul>
+      <p>You can get source files written in TypeScript from
+        <a href="https://github.com/nobuoka/GifWriter.js">a repository on GitHub</a>.</p>
+    </section>
+    <section>
+      <h2>Demo of creating GIF animation with Web Worker</h2>
+      <p>
+        <span>This sample shows that animation GIF is created from these images by using GifWriter.js.</span>
+        <span>These images are distributed at <a href="http://killmebaby.tv/special_icon.html">the official site of “Kill Me Baby” (キルミーベイベー)</a>.</span>
+      </p>
+      <div id="source-images-container">
+        <img src="./demo/01.png">
+        <img src="./demo/02.png">
+        <img src="./demo/05.png">
+        <img src="./demo/06.png">
+        <img src="./demo/03.png">
+        <img src="./demo/04.png">
+        <img src="./demo/07.png">
+        <img src="./demo/08.png">
+      </div>
+      <div style="margin: 15px 0; border-left: solid 5px #999999; padding: 3px 8px;">
+        <div>
+          <label>Palette size (number of colors; min: 1, max: 255): <input type="text" value="255" id="palette-size-input"></label>
+        </div>
+        <div>
+          <label>Delay time [ms] (min: 0, max: 10000): <input type="text" value="200" id="delay-time-input"></label>
+        </div>
+        <div>
+          <button id="start-button" disabled="disabled">please wait...</button>
+        </div>
+      </div>
+      <div id="result-container"></div>
+      <script src="./demo/main.bundle.js"></script>
+    </section>
+
+    <section>
+      <h2>License</h2>
+      <p>GifWriter.js is released under <a href="http://opensource.org/licenses/MIT">the MIT License</a>.</p>
+    </section>
+  </body>
+</html> 

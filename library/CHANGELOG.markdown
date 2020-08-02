@@ -1,3 +1,10 @@
+### v0.9.4
+
+* Add documentation comment
+* Change type of `IImageData#data` property (before: `number[]`, after: `Uint8ClampedArray | number[]`)
+* Refactor some codes
+* Update package.json
+
 ### v0.9.3 (2016-02-28):
 
 Only README file is changed.

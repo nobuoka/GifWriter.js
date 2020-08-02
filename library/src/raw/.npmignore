@@ -1,0 +1,4 @@
+*.map
+*.test.js
+*.test.d.ts
+/__test__/

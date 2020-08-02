@@ -1,21 +1,14 @@
 plugins {
-    id "com.moowork.node" version "0.11"
+    id "com.moowork.node" version "1.3.1"
 }
 
 node {
-    version = '5.7.0'
-    npmVersion = '3.7.5'
+    version = '12.18.3'
+    npmVersion = '6.14.7'
     download = true
 }
 
-task tsTypingsInstall(type: NodeTask, dependsOn: npmInstall) {
-    script = file('node_modules/typings/dist/bin/typings')
-    args = ['install']
-    inputs.file file('typings.json')
-    outputs.dir file('typings')
-}
-
-task compileTypeScript(type: NodeTask, dependsOn: [npmInstall, tsTypingsInstall]) {
+task compileTypeScript(type: NodeTask, dependsOn: npmInstall) {
     script = file('node_modules/typescript/bin/tsc')
     args = ['-p', 'src/main', '--outDir', './build/main/']
 }

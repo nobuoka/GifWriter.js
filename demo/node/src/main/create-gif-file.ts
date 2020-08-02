@@ -1,5 +1,3 @@
-/// <reference path="..\..\typings\main.d.ts" />
-
 import * as gw from "gif-writer";
 import * as fs from "fs";
 
