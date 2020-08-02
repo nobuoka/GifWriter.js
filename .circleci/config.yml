@@ -1,0 +1,59 @@
+# See: https://circleci.com/docs/2.0/language-java/
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:14-jdk-buster
+    working_directory: ~/repo
+
+    environment:
+      # Configure the JVM and Gradle to avoid OOM errors
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+
+    steps:
+      - checkout
+
+      - run:
+          name: Calculate cache key for Gradle dependencies
+          command: |
+            {
+              md5sum gradle/wrapper/gradle-wrapper.properties
+              md5sum settings.gradle
+              md5sum $(find . -name 'build.gradle' | sort -r)
+            } > ~/cache-key-source-gradle
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}
+
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "library/package-lock.json" }}
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "demo/node/package-lock.json" }}
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "demo/web/package-lock.json" }}
+
+      - run: ./gradlew build
+      - run: ./gradlew :library:uploadTestCoverage
+
+      - restore_cache:
+          paths:
+            - library/node_modules
+          key: v1-dependencies-{{ checksum "library/package-lock.json" }}
+      - restore_cache:
+          paths:
+            - demo/node/node_modules
+          key: v1-dependencies-{{ checksum "demo/node/package-lock.json" }}
+      - restore_cache:
+          paths:
+            - demo/web/node_modules
+          key: v1-dependencies-{{ checksum "demo/web/package-lock.json" }}
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+            - .gradle
+            - library/.gradle
+            - demo/node/.gradle
+            - demo/web/.gradle
+          key: v1-dependencies-{{ checksum "~/cache-key-source-gradle" }}
