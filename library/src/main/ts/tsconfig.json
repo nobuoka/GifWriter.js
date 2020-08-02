@@ -4,6 +4,6 @@
         "declaration": true,
         "sourceMap": true,
         "noEmitOnError": true,
-        "noImplicitAny": true
+        "strict": true
     }
 }

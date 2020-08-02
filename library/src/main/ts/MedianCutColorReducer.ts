@@ -191,8 +191,8 @@ class ColorCube {
 export class MedianCutColorReducer {
     private __imageData: IImageData;
     private __maxPaletteSize: number;
-    private __palette: IColor[];
-    private __colorReductionMap: { [colorRGBStr: string]: number; };
+    private __palette: IColor[] = [];
+    private __colorReductionMap: { [colorRGBStr: string]: number; } = {};
 
     constructor(imageData: IImageData, maxPaletteSize: number) {
         this.__imageData = imageData;
@@ -273,8 +273,11 @@ export class MedianCutColorReducer {
         return cubes;
     }
 
-    private __getLargestCube(cubes: ColorCube[]) {
-        var max: ColorCube = null;
+    /**
+     * @param cubes This must include one or more elements.
+     */
+    private __getLargestCube(cubes: ColorCube[]): ColorCube {
+        var max: ColorCube | undefined;
         var maxCount = 0
         cubes.forEach((x) => {
             var cc = x.getNumberOfColors();
@@ -283,6 +286,7 @@ export class MedianCutColorReducer {
                 maxCount = cc;
             }
         });
+        if (max === undefined) throw Error("`cubes` must have one or more elements.");
         return max;
     }
 }
