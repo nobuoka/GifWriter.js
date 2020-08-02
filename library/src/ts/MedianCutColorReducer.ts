@@ -148,6 +148,13 @@ class ColorCube {
     }
 }
 
+/**
+ * Simple color quantizer.
+ *
+ * It uses the median cut algorithm.
+ * If you have a full color image data and you want to write it as GIF by using GifWriter,
+ * you must do color quantization by using this class (or by other way) first.
+ */
 export class MedianCutColorReducer {
     private __imageData: IImageData;
     private __maxPaletteSize: number;

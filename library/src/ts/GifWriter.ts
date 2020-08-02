@@ -138,6 +138,13 @@ function compressWithLZW(actualCodes: number[], numBits: number) {
     return bb.flush();
 }
 
+/**
+ * This class writes an indexed color image data to an output stream.
+ *
+ * * An indexed color image data is represented with an object which has `IIndexedColorImage` interface.
+ *   The `IndexedColorImage` implements this interface.
+ * * An output stream is represented with an object which has `IOutputStream` interface.
+ */
 export class GifWriter {
     private __os: IOutputStream;
     constructor(outputStream: IOutputStream) {
