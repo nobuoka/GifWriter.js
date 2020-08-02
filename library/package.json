@@ -1,15 +1,6 @@
 {
-  "name": "gif-writer-dev",
   "private": true,
   "description": "For git-writer developers",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nobuoka/GifWriter.js.git"
-  },
-  "license": "MIT",
-  "scripts": {
-    "test": "./gradlew check"
-  },
   "devDependencies": {
     "typescript": "^3.9.7",
     "mocha": "^5.0.0"

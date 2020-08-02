@@ -5,7 +5,7 @@
   "keywords": [
     "GIF"
   ],
-  "homepage": "http://nobuoka.github.io/GifWriter.js/",
+  "homepage": "https://nobuoka.github.io/GifWriter.js/",
   "bugs": {
     "url": "https://github.com/nobuoka/GifWriter.js/issues"
   },
@@ -15,7 +15,7 @@
   },
   "license": "MIT",
   "author": {
-    "name": "Nobuoka Yu",
+    "name": "Nobuoka Yuya",
     "url": "https://github.com/nobuoka"
   },
   "main": "./index.js",

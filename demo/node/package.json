@@ -1,6 +1,5 @@
 {
-  "name": "gif-writer-demo-node",
-  "version": "0.9.3",
+  "private": true,
   "dependencies": {
     "gif-writer": "0.9.3"
   },
