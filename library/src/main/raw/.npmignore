@@ -1,1 +1,3 @@
 *.map
+*.test.js
+/__test__/

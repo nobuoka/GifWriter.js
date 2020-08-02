@@ -21,14 +21,9 @@ task copyRawFiles(type: Copy) {
 
 task assemble(dependsOn: [compileTypeScript, copyRawFiles])
 
-task compileTestTypeScript(type: NodeTask, dependsOn: compileTypeScript) {
-    script = file('node_modules/typescript/bin/tsc')
-    args = ['-p', 'src/test/ts', '--outDir', './build/node_modules/test/']
-}
-
-task test(type: NodeTask, dependsOn: compileTestTypeScript) {
+task test(type: NodeTask, dependsOn: compileTypeScript) {
     script = file('node_modules/mocha/bin/mocha')
-    args = ['-u', 'qunit', '-R', 'tap', './build/node_modules/test/*.js']
+    args = ['-u', 'qunit', '-R', 'tap', './build/node_modules/main/*.test.js']
 }
 
 task check(dependsOn: test)

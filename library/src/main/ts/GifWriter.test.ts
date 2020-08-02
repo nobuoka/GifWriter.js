@@ -1,5 +1,5 @@
-import {GifWriter, IndexedColorImage, IOutputStream} from "main";
-import t from "./test_common";
+import {GifWriter, IndexedColorImage, IOutputStream} from "./GifWriter";
+import t from "./__test__/test_common";
 
 class TestOutputStream implements IOutputStream {
     buffer: number[] = [];

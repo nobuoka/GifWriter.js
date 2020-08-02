@@ -1,5 +1,5 @@
-import {MedianCutColorReducer} from "main";
-import t from "./test_common";
+import {MedianCutColorReducer} from "./MedianCutColorReducer";
+import t from "./__test__/test_common";
 
 function indexToColorArray(paletteData: number[], index: number): [number, number, number] {
     return [paletteData[index*3+0],paletteData[index*3+1],paletteData[index*3+2]];
