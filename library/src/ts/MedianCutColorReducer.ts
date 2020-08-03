@@ -48,73 +48,7 @@ class ColorCube {
     }
 
     divide(): ColorCube[] {
-        var cut = this.largestEdge()
-        var med = this.median(cut)
-        var r = this.divideBy(cut, med)
-        return r;
-    }
-
-    private divideBy(cutTargetColor: ColorName, median: RgbComponentIntensity) {
-        var list0: IColor[] = [];
-        var list1: IColor[] = [];
-        this.colors.forEach((c) => {
-            if (c[cutTargetColor] < median) {
-                list0.push(c);
-            } else {
-                list1.push(c);
-            }
-        });
-        if (list0.length > 0 && list1.length > 0) {
-            return [new ColorCube(list0), new ColorCube(list1)];
-        } else {
-            return [];
-        }
-    }
-
-    private median(cutTargetColor: ColorName): RgbComponentIntensity {
-        var cc: RgbComponentIntensity[] = [];
-        var colors = this.colors;
-        for (var i = 0, len = colors.length; i < len; ++i) {
-            cc.push(colors[i][cutTargetColor]);
-        }
-        var med2 = selectKthElem(cc, Math.floor(cc.length / 2) + 1);
-        return med2;
-    }
-
-    private largestEdge(): ColorName {
-        var minR = 255;
-        var maxR = 0;
-        var minG = 255;
-        var maxG = 0;
-        var minB = 255;
-        var maxB = 0;
-
-        this.colors.forEach((color) => {
-            if (color.red < minR) minR = color.red;
-            if (color.red > maxR) maxR = color.red;
-            if (color.green < minG) minG = color.green;
-            if (color.green > maxG) maxG = color.green;
-            if (color.blue < minB) minB = color.blue;
-            if (color.blue > maxB) maxB = color.blue;
-        });
-
-        var diffR = (maxR - minR) * 1.0;
-        var diffG = (maxG - minG) * 0.8;
-        var diffB = (maxB - minB) * 0.5;
-
-        if (diffG >= diffB) {
-            if (diffR >= diffG) {
-                return "red";
-            } else {
-                return "green";
-            }
-        } else {
-            if (diffR >=diffB) {
-                return "red";
-            } else {
-                return "blue";
-            }
-        }
+        return ColorCubes.divide(this.colors);
     }
 
     getNumberOfColors() {
@@ -210,6 +144,77 @@ function extractColorsFromImageData(imageData: IImageData): IColor[] {
         }
     }
     return colors;
+}
+
+namespace ColorCubes {
+    export function divide(colors: IColor[]): ColorCube[] {
+        let cut = largestEdge(colors);
+        let med = median(colors, cut);
+        let r = divideBy(colors, cut, med);
+        return r;
+    }
+
+    function largestEdge(colors: IColor[]): ColorName {
+        var minR = 255;
+        var maxR = 0;
+        var minG = 255;
+        var maxG = 0;
+        var minB = 255;
+        var maxB = 0;
+
+        colors.forEach((color) => {
+            if (color.red < minR) minR = color.red;
+            if (color.red > maxR) maxR = color.red;
+            if (color.green < minG) minG = color.green;
+            if (color.green > maxG) maxG = color.green;
+            if (color.blue < minB) minB = color.blue;
+            if (color.blue > maxB) maxB = color.blue;
+        });
+
+        var diffR = (maxR - minR) * 1.0;
+        var diffG = (maxG - minG) * 0.8;
+        var diffB = (maxB - minB) * 0.5;
+
+        if (diffG >= diffB) {
+            if (diffR >= diffG) {
+                return "red";
+            } else {
+                return "green";
+            }
+        } else {
+            if (diffR >=diffB) {
+                return "red";
+            } else {
+                return "blue";
+            }
+        }
+    }
+
+    function median(colors: IColor[], cutTargetColor: ColorName): RgbComponentIntensity {
+        var cc: RgbComponentIntensity[] = [];
+        for (var i = 0, len = colors.length; i < len; ++i) {
+            cc.push(colors[i][cutTargetColor]);
+        }
+        var med2 = selectKthElem(cc, Math.floor(cc.length / 2) + 1);
+        return med2;
+    }
+
+    function divideBy(colors: IColor[], cutTargetColor: ColorName, median: RgbComponentIntensity) {
+        var list0: IColor[] = [];
+        var list1: IColor[] = [];
+        colors.forEach((c) => {
+            if (c[cutTargetColor] < median) {
+                list0.push(c);
+            } else {
+                list1.push(c);
+            }
+        });
+        if (list0.length > 0 && list1.length > 0) {
+            return [new ColorCube(list0), new ColorCube(list1)];
+        } else {
+            return [];
+        }
+    }
 }
 
 namespace MedianCut {
