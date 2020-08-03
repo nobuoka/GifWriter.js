@@ -43,36 +43,8 @@ export interface IColor {
 }
 class ColorCube {
     colors: IColor[];
-    __minR: RgbComponentIntensity;
-    __maxR: RgbComponentIntensity;
-    __minB: RgbComponentIntensity;
-    __maxB: RgbComponentIntensity;
-    __minG: RgbComponentIntensity;
-    __maxG: RgbComponentIntensity;
     constructor(colors: IColor[]) {
         this.colors = colors;
-        var minR = 255
-        var maxR = 0
-        var minG = 255
-        var maxG = 0
-        var minB = 255
-        var maxB = 0
-
-        colors.forEach((color) => {
-            if (color.red < minR) minR = color.red;
-            if (color.red > maxR) maxR = color.red;
-            if (color.green < minG) minG = color.green;
-            if (color.green > maxG) maxG = color.green;
-            if (color.blue < minB) minB = color.blue;
-            if (color.blue > maxB) maxB = color.blue;
-        });
-
-        this.__minR = minR;
-        this.__maxR = maxR;
-        this.__minG = minG;
-        this.__maxG = maxG;
-        this.__minB = minB;
-        this.__maxB = maxB;
     }
 
     divide(): ColorCube[] {
@@ -110,9 +82,25 @@ class ColorCube {
     }
 
     private largestEdge(): ColorName {
-        var diffR = (this.__maxR - this.__minR) * 1.0;
-        var diffG = (this.__maxG - this.__minG) * 0.8;
-        var diffB = (this.__maxB - this.__minB) * 0.5;
+        var minR = 255;
+        var maxR = 0;
+        var minG = 255;
+        var maxG = 0;
+        var minB = 255;
+        var maxB = 0;
+
+        this.colors.forEach((color) => {
+            if (color.red < minR) minR = color.red;
+            if (color.red > maxR) maxR = color.red;
+            if (color.green < minG) minG = color.green;
+            if (color.green > maxG) maxG = color.green;
+            if (color.blue < minB) minB = color.blue;
+            if (color.blue > maxB) maxB = color.blue;
+        });
+
+        var diffR = (maxR - minR) * 1.0;
+        var diffG = (maxG - minG) * 0.8;
+        var diffB = (maxB - minB) * 0.5;
 
         if (diffG >= diffB) {
             if (diffR >= diffG) {
