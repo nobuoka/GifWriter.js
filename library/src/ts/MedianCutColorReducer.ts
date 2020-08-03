@@ -47,7 +47,7 @@ class ColorCube {
         this.colors = colors;
     }
 
-    divide(): ColorCube[] {
+    divide(): [] | [ColorCube, ColorCube] {
         return ColorCubes.divide(this.colors);
     }
 
@@ -147,7 +147,7 @@ function extractColorsFromImageData(imageData: IImageData): IColor[] {
 }
 
 namespace ColorCubes {
-    export function divide(colors: IColor[]): ColorCube[] {
+    export function divide(colors: IColor[]): [] | [ColorCube, ColorCube] {
         let cut = largestEdge(colors);
         let med = median(colors, cut);
         let r = divideBy(colors, cut, med);
@@ -199,7 +199,7 @@ namespace ColorCubes {
         return med2;
     }
 
-    function divideBy(colors: IColor[], cutTargetColor: ColorName, median: RgbComponentIntensity) {
+    function divideBy(colors: IColor[], cutTargetColor: ColorName, median: RgbComponentIntensity): [] | [ColorCube, ColorCube] {
         var list0: IColor[] = [];
         var list1: IColor[] = [];
         colors.forEach((c) => {
