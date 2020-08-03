@@ -173,8 +173,8 @@ export class MedianCutColorReducer {
         var imageData = this.__imageData;
         var maxcolor = this.__maxPaletteSize;
 
-        var colors = this.__extractColors(imageData);
-        var cubes = this.__medianCut(colors, maxcolor);
+        var colors = extractColorsFromImageData(imageData);
+        var cubes = MedianCut.medianCut(colors, maxcolor);
         var palette: IColor[] = [];
         var colorReductionMap = Object.create(null);
         cubes.forEach((cube, idx) => {
@@ -204,35 +204,37 @@ export class MedianCutColorReducer {
         }
         return this.__colorReductionMap[rgb];
     }
+}
 
-    private __extractColors(imageData: IImageData) {
-        var maxIndex = imageData.width * imageData.height;
+function extractColorsFromImageData(imageData: IImageData): IColor[] {
+    var maxIndex = imageData.width * imageData.height;
 
-        var colorHash: { [rgb: string]: boolean; } = {};
-        var colors: IColor[] = [];
-        for (var i = 0; i < maxIndex; ++i) {
-            var r = imageData.data[i*4+0];
-            var g = imageData.data[i*4+1];
-            var b = imageData.data[i*4+2];
-            let rgb = convertRgbTripletToRgbString(r, g, b);
-            if (!colorHash[rgb]) {
-                colorHash[rgb] = true;
-                colors.push({ red: r, green: g, blue: b });
-            }
+    var colorHash: { [rgb: string]: boolean; } = {};
+    var colors: IColor[] = [];
+    for (var i = 0; i < maxIndex; ++i) {
+        var r = imageData.data[i*4+0];
+        var g = imageData.data[i*4+1];
+        var b = imageData.data[i*4+2];
+        let rgb = convertRgbTripletToRgbString(r, g, b);
+        if (!colorHash[rgb]) {
+            colorHash[rgb] = true;
+            colors.push({ red: r, green: g, blue: b });
         }
-        return colors;
     }
+    return colors;
+}
 
-    private __medianCut(colors: IColor[], maxColor: number) {
+namespace MedianCut {
+    export function medianCut(colors: IColor[], maxColor: number): ColorCube[] {
         var cube = new ColorCube(colors);
-        var divided = this.__divideUntil([cube], maxColor);
+        var divided = divideCubesUntil([cube], maxColor);
         return divided;
     }
 
-    private __divideUntil(cubes: ColorCube[], limit: number) {
+    function divideCubesUntil(cubes: ColorCube[], limit: number): ColorCube[] {
         while (true) {
             if (cubes.length >= limit) break;
-            var largestCube = this.__getLargestCube(cubes);
+            var largestCube = getLargestCube(cubes);
             var dcubes = largestCube.divide();
             if (dcubes.length < 2) break;
             cubes = cubes.filter(function (c) { return c !== largestCube }).concat(dcubes);
@@ -243,7 +245,7 @@ export class MedianCutColorReducer {
     /**
      * @param cubes This must include one or more elements.
      */
-    private __getLargestCube(cubes: ColorCube[]): ColorCube {
+    function getLargestCube(cubes: ColorCube[]): ColorCube {
         var max: ColorCube | undefined;
         var maxCount = 0
         cubes.forEach((x) => {
