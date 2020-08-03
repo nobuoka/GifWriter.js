@@ -180,8 +180,7 @@ export class MedianCutColorReducer {
         cubes.forEach((cube, idx) => {
             palette.push(cube.average());
             cube.colors.forEach(function (c) {
-                var rgb = ((c.red << 16) | (c.green << 8) | (c.blue << 0)).toString(16);
-                while (6 - rgb.length) rgb = "0" + rgb;
+                let rgb = convertRgbTripletToRgbString(c.red, c.green, c.blue);
                 colorReductionMap[rgb] = idx;
             });
         });
@@ -198,8 +197,7 @@ export class MedianCutColorReducer {
     }
 
     map(r: RgbComponentIntensity, g: RgbComponentIntensity, b: RgbComponentIntensity) {
-        var rgb = ((r << 16) | (g << 8) | (b << 0)).toString(16);
-        while (6 - rgb.length) rgb = "0" + rgb;
+        let rgb = convertRgbTripletToRgbString(r, g, b);
         if (!(rgb in this.__colorReductionMap)) {
             this.__colorReductionMap[rgb] =
                 searchClosestColorIndex({ red: r, green: g, blue: b }, this.__palette);
@@ -216,8 +214,7 @@ export class MedianCutColorReducer {
             var r = imageData.data[i*4+0];
             var g = imageData.data[i*4+1];
             var b = imageData.data[i*4+2];
-            var rgb = ((r << 16) | (g << 8) | (b << 0)).toString(16);
-            while (6 - rgb.length) rgb = "0" + rgb;
+            let rgb = convertRgbTripletToRgbString(r, g, b);
             if (!colorHash[rgb]) {
                 colorHash[rgb] = true;
                 colors.push({ red: r, green: g, blue: b });
@@ -259,4 +256,10 @@ export class MedianCutColorReducer {
         if (max === undefined) throw Error("`cubes` must have one or more elements.");
         return max;
     }
+}
+
+function convertRgbTripletToRgbString(red: RgbComponentIntensity, green: RgbComponentIntensity, blue: RgbComponentIntensity): string {
+    var rgb = ((red << 16) | (green << 8) | (blue << 0)).toString(16);
+    while (6 - rgb.length) rgb = "0" + rgb;
+    return rgb;
 }
