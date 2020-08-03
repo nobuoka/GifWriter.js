@@ -82,7 +82,7 @@ class ColorCube {
         return r;
     }
 
-    divideBy(cutTargetColor: ColorName, median: RgbComponentIntensity) {
+    private divideBy(cutTargetColor: ColorName, median: RgbComponentIntensity) {
         var list0: IColor[] = [];
         var list1: IColor[] = [];
         this.colors.forEach((c) => {
@@ -99,7 +99,7 @@ class ColorCube {
         }
     }
 
-    median(cutTargetColor: ColorName): RgbComponentIntensity {
+    private median(cutTargetColor: ColorName): RgbComponentIntensity {
         var cc: RgbComponentIntensity[] = [];
         var colors = this.colors;
         for (var i = 0, len = colors.length; i < len; ++i) {
@@ -109,7 +109,7 @@ class ColorCube {
         return med2;
     }
 
-    largestEdge(): ColorName {
+    private largestEdge(): ColorName {
         var diffR = (this.__maxR - this.__minR) * 1.0;
         var diffG = (this.__maxG - this.__minG) * 0.8;
         var diffB = (this.__maxB - this.__minB) * 0.5;
