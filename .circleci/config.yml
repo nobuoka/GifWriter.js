@@ -36,15 +36,15 @@ jobs:
       - run: ./gradlew build
       - run: ./gradlew :library:uploadTestCoverage
 
-      - restore_cache:
+      - save_cache:
           paths:
             - library/node_modules
           key: v1-dependencies-{{ checksum "library/package-lock.json" }}
-      - restore_cache:
+      - save_cache:
           paths:
             - demo/node/node_modules
           key: v1-dependencies-{{ checksum "demo/node/package-lock.json" }}
-      - restore_cache:
+      - save_cache:
           paths:
             - demo/web/node_modules
           key: v1-dependencies-{{ checksum "demo/web/package-lock.json" }}
