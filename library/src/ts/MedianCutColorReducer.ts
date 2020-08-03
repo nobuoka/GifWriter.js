@@ -86,7 +86,7 @@ class ColorCube {
         var list0: IColor[] = [];
         var list1: IColor[] = [];
         this.colors.forEach((c) => {
-            if ((<any>c)[cutTargetColor] < median) {
+            if (c[cutTargetColor] < median) {
                 list0.push(c);
             } else {
                 list1.push(c);
@@ -103,7 +103,7 @@ class ColorCube {
         var cc: RgbComponentIntensity[] = [];
         var colors = this.colors;
         for (var i = 0, len = colors.length; i < len; ++i) {
-            cc.push((<any>(colors[i]))[cutTargetColor]);
+            cc.push(colors[i][cutTargetColor]);
         }
         var med2 = selectKthElem(cc, Math.floor(cc.length / 2) + 1);
         return med2;
