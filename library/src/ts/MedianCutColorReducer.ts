@@ -1,11 +1,14 @@
 import {selectKthElem} from "./Selection";
 
+/** This type expects integer from 0 to 255 inclusive. */
+export type RgbComponentIntensity = number;
+
 // This interface corresponds to `ImageData` interface of HTML standard.
 // See: https://html.spec.whatwg.org/multipage/scripting.html#imagedata
 export interface IImageData {
     width: number;
     height: number;
-    data: Uint8ClampedArray | number[];
+    data: Uint8ClampedArray | RgbComponentIntensity[];
 }
 
 function searchClosestColorIndex(color: IColor, palette: IColor[]) {
@@ -34,18 +37,18 @@ function searchClosestColorIndex(color: IColor, palette: IColor[]) {
 
 type ColorName = "red" | "blue" | "green";
 export interface IColor {
-    red: number;
-    blue: number;
-    green: number;
+    red: RgbComponentIntensity;
+    blue: RgbComponentIntensity;
+    green: RgbComponentIntensity;
 }
 class ColorCube {
     colors: IColor[];
-    __minR: number;
-    __maxR: number;
-    __minB: number;
-    __maxB: number;
-    __minG: number;
-    __maxG: number;
+    __minR: RgbComponentIntensity;
+    __maxR: RgbComponentIntensity;
+    __minB: RgbComponentIntensity;
+    __maxB: RgbComponentIntensity;
+    __minG: RgbComponentIntensity;
+    __maxG: RgbComponentIntensity;
     constructor(colors: IColor[]) {
         this.colors = colors;
         var minR = 255
@@ -79,7 +82,7 @@ class ColorCube {
         return r;
     }
 
-    divideBy(cutTargetColor: ColorName, median: number) {
+    divideBy(cutTargetColor: ColorName, median: RgbComponentIntensity) {
         var list0: IColor[] = [];
         var list1: IColor[] = [];
         this.colors.forEach((c) => {
@@ -96,8 +99,8 @@ class ColorCube {
         }
     }
 
-    median(cutTargetColor: ColorName): number {
-        var cc: number[] = [];
+    median(cutTargetColor: ColorName): RgbComponentIntensity {
+        var cc: RgbComponentIntensity[] = [];
         var colors = this.colors;
         for (var i = 0, len = colors.length; i < len; ++i) {
             cc.push((<any>(colors[i]))[cutTargetColor]);
@@ -166,7 +169,7 @@ export class MedianCutColorReducer {
         this.__maxPaletteSize = maxPaletteSize || 0xFF;
     }
 
-    process() {
+    process(): RgbComponentIntensity[] {
         var imageData = this.__imageData;
         var maxcolor = this.__maxPaletteSize;
 
@@ -185,7 +188,7 @@ export class MedianCutColorReducer {
         this.__palette = palette;
         this.__colorReductionMap = colorReductionMap;
 
-        var paletteData: number[] = [];
+        var paletteData: RgbComponentIntensity[] = [];
         palette.forEach((color) => {
             paletteData.push(color.red);
             paletteData.push(color.green);
@@ -194,7 +197,7 @@ export class MedianCutColorReducer {
         return paletteData;
     }
 
-    map(r: number, g: number, b: number) {
+    map(r: RgbComponentIntensity, g: RgbComponentIntensity, b: RgbComponentIntensity) {
         var rgb = ((r << 16) | (g << 8) | (b << 0)).toString(16);
         while (6 - rgb.length) rgb = "0" + rgb;
         if (!(rgb in this.__colorReductionMap)) {
