@@ -41,37 +41,6 @@ export interface IColor {
     blue: RgbComponentIntensity;
     green: RgbComponentIntensity;
 }
-class ColorCube {
-    colors: IColor[];
-    constructor(colors: IColor[]) {
-        this.colors = colors;
-    }
-
-    divide(): [] | [ColorCube, ColorCube] {
-        return (<IColor[][]>ColorCubes.divide(this.colors)).map((e) => new ColorCube(e)) as ([] | [ColorCube, ColorCube]);
-    }
-
-    getNumberOfColors() {
-        return this.colors.length;
-    }
-
-    average() {
-        var sumR = 0
-        var sumG = 0
-        var sumB = 0
-        this.colors.forEach((c) => {
-            sumR += c.red;
-            sumG += c.green;
-            sumB += c.blue;
-        });
-        var size = this.colors.length;
-        return {
-            red: Math.floor(sumR/size),
-            green: Math.floor(sumG/size),
-            blue: Math.floor(sumB/size),
-        };
-    }
-}
 
 /**
  * Simple color quantizer.
@@ -100,8 +69,8 @@ export class MedianCutColorReducer {
         var palette: IColor[] = [];
         var colorReductionMap = Object.create(null);
         cubes.forEach((cube, idx) => {
-            palette.push(cube.average());
-            cube.colors.forEach(function (c) {
+            palette.push(ColorCubes.average(cube));
+            cube.forEach(function (c) {
                 let rgb = convertRgbTripletToRgbString(c.red, c.green, c.blue);
                 colorReductionMap[rgb] = idx;
             });
@@ -152,6 +121,23 @@ namespace ColorCubes {
         let med = median(colors, cut);
         let r = divideBy(colors, cut, med);
         return r;
+    }
+
+    export function average(colors: IColor[]) {
+        var sumR = 0
+        var sumG = 0
+        var sumB = 0
+        colors.forEach((c) => {
+            sumR += c.red;
+            sumG += c.green;
+            sumB += c.blue;
+        });
+        var size = colors.length;
+        return {
+            red: Math.floor(sumR/size),
+            green: Math.floor(sumG/size),
+            blue: Math.floor(sumB/size),
+        };
     }
 
     function largestEdge(colors: IColor[]): ColorName {
@@ -218,17 +204,16 @@ namespace ColorCubes {
 }
 
 namespace MedianCut {
-    export function medianCut(colors: IColor[], maxColor: number): ColorCube[] {
-        var cube = new ColorCube(colors);
-        var divided = divideCubesUntil([cube], maxColor);
+    export function medianCut(colors: IColor[], maxColor: number): IColor[][] {
+        var divided = divideCubesUntil([colors], maxColor);
         return divided;
     }
 
-    function divideCubesUntil(cubes: ColorCube[], limit: number): ColorCube[] {
+    function divideCubesUntil(cubes: IColor[][], limit: number): IColor[][] {
         while (true) {
             if (cubes.length >= limit) break;
             var largestCube = getLargestCube(cubes);
-            var dcubes = largestCube.divide();
+            var dcubes = ColorCubes.divide(largestCube);
             if (dcubes.length < 2) break;
             cubes = cubes.filter(function (c) { return c !== largestCube }).concat(dcubes);
         }
@@ -238,11 +223,11 @@ namespace MedianCut {
     /**
      * @param cubes This must include one or more elements.
      */
-    function getLargestCube(cubes: ColorCube[]): ColorCube {
-        var max: ColorCube | undefined;
+    function getLargestCube(cubes: IColor[][]): IColor[] {
+        var max: IColor[] | undefined;
         var maxCount = 0
         cubes.forEach((x) => {
-            var cc = x.getNumberOfColors();
+            var cc = x.length;
             if (cc > maxCount) {
                 max = x;
                 maxCount = cc;
