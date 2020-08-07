@@ -76,3 +76,18 @@ t.testAsync("3 colors to 2 colors", (done) => {
         "Red is mapped to #8F0000");
     done();
 });
+
+t.testAsync("The `map` method returns -1 when `process` method was not called", (done) => {
+    var imageData = {
+        width: 2,
+        height: 2,
+        data: [
+            0x00,0x00,0x00,0x00, 0x20,0x00,0x00,0x00,
+            0x10,0x00,0x00,0x00, 0xFF,0x00,0x00,0x00,
+        ],
+    };
+    var reducer = new MedianCutColorReducer(imageData, 2);
+    let value = reducer.map(0x00,0x00,0x00);
+    t.strictEqual(value, -1);
+    done();
+});
