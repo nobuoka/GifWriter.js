@@ -35,7 +35,7 @@ function searchClosestColorIndex(color: IColor, palette: IColor[]) {
     return (found ? foundIndex : closestIndex);
 }
 
-type ColorName = "red" | "blue" | "green";
+type RgbComponentName = keyof IColor;
 export interface IColor {
     red: RgbComponentIntensity;
     blue: RgbComponentIntensity;
@@ -52,8 +52,7 @@ export interface IColor {
 export class MedianCutColorReducer {
     private __imageData: IImageData;
     private __maxPaletteSize: number;
-    private __palette: IColor[] = [];
-    private __colorReductionMap: { [colorRGBStr: string]: number; } = {};
+    private __palette: ReducedColorPalette = new ReducedColorPaletteImpl([], {});
 
     constructor(imageData: IImageData, maxPaletteSize: number) {
         this.__imageData = imageData;
@@ -61,25 +60,11 @@ export class MedianCutColorReducer {
     }
 
     process(): RgbComponentIntensity[] {
-        var imageData = this.__imageData;
-        var maxcolor = this.__maxPaletteSize;
-
-        var colors = extractColorsFromImageData(imageData);
-        var cubes = MedianCut.medianCut(colors, maxcolor);
-        var palette: IColor[] = [];
-        var colorReductionMap = Object.create(null);
-        cubes.forEach((cube, idx) => {
-            palette.push(ColorCubes.average(cube));
-            cube.forEach(function (c) {
-                let rgb = convertRgbTripletToRgbString(c.red, c.green, c.blue);
-                colorReductionMap[rgb] = idx;
-            });
-        });
-        this.__palette = palette;
-        this.__colorReductionMap = colorReductionMap;
+        var colors = extractColorsFromImageData(this.__imageData);
+        this.__palette = reduceColors(colors, this.__maxPaletteSize);
 
         var paletteData: RgbComponentIntensity[] = [];
-        palette.forEach((color) => {
+        this.__palette.colors.forEach((color) => {
             paletteData.push(color.red);
             paletteData.push(color.green);
             paletteData.push(color.blue);
@@ -88,13 +73,46 @@ export class MedianCutColorReducer {
     }
 
     map(r: RgbComponentIntensity, g: RgbComponentIntensity, b: RgbComponentIntensity) {
-        let rgb = convertRgbTripletToRgbString(r, g, b);
-        if (!(rgb in this.__colorReductionMap)) {
-            this.__colorReductionMap[rgb] =
-                searchClosestColorIndex({ red: r, green: g, blue: b }, this.__palette);
-        }
-        return this.__colorReductionMap[rgb];
+        return this.__palette.indexOfClosestColor({ red: r, green: g, blue: b });
     }
+}
+
+interface ReducedColorPalette {
+    readonly colors: IColor[];
+    indexOfClosestColor(color: IColor): number;
+}
+
+class ReducedColorPaletteImpl implements ReducedColorPalette {
+    readonly colors: IColor[];
+    private _colorReductionMap: { [colorRgbString: string]: number };
+
+    constructor(colors: IColor[], colorReductionMap: { [colorRgbString: string]: number }) {
+        this.colors = colors;
+        this._colorReductionMap = colorReductionMap;
+    }
+
+    indexOfClosestColor(color: IColor) {
+        let rgb = convertRgbTripletToRgbString(color.red, color.green, color.blue);
+        if (!(rgb in this._colorReductionMap)) {
+            this._colorReductionMap[rgb] = searchClosestColorIndex(color, this.colors);
+        }
+        return this._colorReductionMap[rgb];
+    }
+}
+
+function reduceColors(colors: IColor[], maxPaletteSize: number): ReducedColorPalette {
+    var cubes = MedianCut.medianCut(colors, maxPaletteSize);
+    var palette: IColor[] = [];
+    var colorReductionMap = Object.create(null);
+    cubes.forEach((cube, idx) => {
+        palette.push(ColorCubes.average(cube));
+        cube.forEach(function (c) {
+            let rgb = convertRgbTripletToRgbString(c.red, c.green, c.blue);
+            colorReductionMap[rgb] = idx;
+        });
+    });
+
+    return new ReducedColorPaletteImpl(palette, colorReductionMap);
 }
 
 function extractColorsFromImageData(imageData: IImageData): IColor[] {
@@ -140,7 +158,7 @@ namespace ColorCubes {
         };
     }
 
-    function largestEdge(colors: IColor[]): ColorName {
+    function largestEdge(colors: IColor[]): RgbComponentName {
         var minR = 255;
         var maxR = 0;
         var minG = 255;
@@ -176,7 +194,7 @@ namespace ColorCubes {
         }
     }
 
-    function median(colors: IColor[], cutTargetColor: ColorName): RgbComponentIntensity {
+    function median(colors: IColor[], cutTargetColor: RgbComponentName): RgbComponentIntensity {
         var cc: RgbComponentIntensity[] = [];
         for (var i = 0, len = colors.length; i < len; ++i) {
             cc.push(colors[i][cutTargetColor]);
@@ -185,7 +203,7 @@ namespace ColorCubes {
         return med2;
     }
 
-    function divideBy(colors: IColor[], cutTargetColor: ColorName, median: RgbComponentIntensity): [] | [IColor[], IColor[]] {
+    function divideBy(colors: IColor[], cutTargetColor: RgbComponentName, median: RgbComponentIntensity): [] | [IColor[], IColor[]] {
         var list0: IColor[] = [];
         var list1: IColor[] = [];
         colors.forEach((c) => {
