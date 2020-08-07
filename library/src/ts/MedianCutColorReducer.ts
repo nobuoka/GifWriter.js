@@ -48,7 +48,7 @@ class ColorCube {
     }
 
     divide(): [] | [ColorCube, ColorCube] {
-        return ColorCubes.divide(this.colors);
+        return (<IColor[][]>ColorCubes.divide(this.colors)).map((e) => new ColorCube(e)) as ([] | [ColorCube, ColorCube]);
     }
 
     getNumberOfColors() {
@@ -147,7 +147,7 @@ function extractColorsFromImageData(imageData: IImageData): IColor[] {
 }
 
 namespace ColorCubes {
-    export function divide(colors: IColor[]): [] | [ColorCube, ColorCube] {
+    export function divide(colors: IColor[]): [] | [IColor[], IColor[]] {
         let cut = largestEdge(colors);
         let med = median(colors, cut);
         let r = divideBy(colors, cut, med);
@@ -199,7 +199,7 @@ namespace ColorCubes {
         return med2;
     }
 
-    function divideBy(colors: IColor[], cutTargetColor: ColorName, median: RgbComponentIntensity): [] | [ColorCube, ColorCube] {
+    function divideBy(colors: IColor[], cutTargetColor: ColorName, median: RgbComponentIntensity): [] | [IColor[], IColor[]] {
         var list0: IColor[] = [];
         var list1: IColor[] = [];
         colors.forEach((c) => {
@@ -210,7 +210,7 @@ namespace ColorCubes {
             }
         });
         if (list0.length > 0 && list1.length > 0) {
-            return [new ColorCube(list0), new ColorCube(list1)];
+            return [list0, list1];
         } else {
             return [];
         }
