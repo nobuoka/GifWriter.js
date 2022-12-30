@@ -3,7 +3,7 @@
   "description": "For git-writer developers",
   "devDependencies": {
     "codecov": "^3.7.2",
-    "mocha": "^8.1.0",
+    "mocha": "^8.4.0",
     "nyc": "^15.1.0",
     "typescript": "^3.9.7"
   },
